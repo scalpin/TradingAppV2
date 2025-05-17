@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TradingApp.Services;
 using TradingApp.Helpers;
 using System.Text;
+using Tinkoff.InvestApi.V1;
 
 namespace TradingApp.ViewModels
 {
@@ -26,7 +27,13 @@ namespace TradingApp.ViewModels
 
         public async Task PlaceTestOrder()
         {
-            await _tradeService.PlaceTakeProfitOrderAsync("TQBR", "SBER", 350);
+            await _tradeService.PlaceTakeProfitOrderAsync("TQBR", "MTLR", 500);
         }
+
+        public async Task GetOrderBookAsync()
+        {
+            await _tradeService.GetOrderBookAsync("BBG004730N88");
+        }
+
     }
 }

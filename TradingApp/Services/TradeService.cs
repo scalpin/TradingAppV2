@@ -10,11 +10,18 @@ using System.Net.Http.Json;
 using Grpc.Net.Client;
 using System.Collections.Generic;
 using System.Linq;
+using Tinkoff.InvestApi;
+using Tinkoff.InvestApi.V1;
+using System.Threading;
+using Grpc.Core;
+using static Google.Rpc.Context.AttributeContext.Types;
+using System.IO;
 
 public class TradeService
 {
     private readonly HttpClient _httpClient;
     private readonly SettingsService _settings;
+    private readonly InvestApiClient _client;
 
     public TradeService(SettingsService settingsService)
     {
@@ -22,14 +29,15 @@ public class TradeService
         _settings = settingsService;
 
         // Добавляем заголовок с токеном при инициализации
-        _httpClient.DefaultRequestHeaders.Add("X-Api-Key", _settings.Token);
+        _httpClient.DefaultRequestHeaders.Add("X-Api-Key", _settings.fToken);
+        _client = InvestApiClientFactory.Create(_settings.tToken);
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
     }
 
-    // Метод для размещения тейк-профит ордера
+    // Рабочий тейк профит
     public async Task<bool> PlaceTakeProfitOrderAsync(string board, string code, double activationPrice)
     {
-        var endpoint = ApiEndpoints.PlaceStopOrder; // Убедись, что этот константный путь определен
+        var endpoint = ApiEndpoints.PlaceStopOrder;
 
         var requestBody = new
         {
@@ -40,16 +48,21 @@ public class TradeService
             takeProfit = new
             {
                 activationPrice = activationPrice,
+                price = 0,
                 marketPrice = true,
-                quantity = new { value = 1, units = "Percent" },
+                quantity = new
+                {
+                    value = 1,
+                    units = "Lots"
+                },
                 time = 0,
-                useCredit = false
+                useCredit = true
             },
             stopLoss = (object)null,
             validBefore = new
             {
                 type = "TillEndSession",
-                time = DateTime.UtcNow.ToString("o")
+                time = "2025-04-24T10:06:40Z"
             }
         };
 
@@ -70,23 +83,45 @@ public class TradeService
         return false;
     }
 
-    /*
-    public async Task<OrderBookResponse> GetOrderBookRestAsync(string symbol)
+
+    // получение фотки стакана из тинькоффа (работает)
+    public async Task GetOrderBookAsync(string figi)
     {
-        var url = $"https://trade-api.finam.ru/v1/instruments/{symbol}/orderbook";
+        var token = _settings.tToken;
 
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_settings.Token}");
+        var channel = GrpcChannel.ForAddress("https://invest-public-api.tinkoff.ru");
+        var client = new MarketDataService.MarketDataServiceClient(channel);
 
-        var response = await client.GetAsync(url);
-        if (!response.IsSuccessStatusCode)
+        var headers = new Grpc.Core.Metadata
+    {
+        { "Authorization", $"Bearer {token}" }
+    };
+
+        try
         {
-            Console.WriteLine($"Ошибка получения стакана: {response.StatusCode}");
-            return null;
-        }
+            var request = new GetOrderBookRequest
+            {
+                Figi = figi,
+                Depth = 10
+            };
 
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<OrderBookResponse>(json);
+            var response = await client.GetOrderBookAsync(request, headers);
+
+            foreach (var bid in response.Bids)
+            {
+                var price = bid.Price.Units + bid.Price.Nano / 1_000_000_000.0;
+                System.Diagnostics.Debug.WriteLine($"Bid: {price} x {bid.Quantity}");
+            }
+
+            foreach (var ask in response.Asks)
+            {
+                var price = ask.Price.Units + ask.Price.Nano / 1_000_000_000.0;
+                System.Diagnostics.Debug.WriteLine($"Ask: {price} x {ask.Quantity}");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Ошибка при получении стакана: {ex.Message}");
+        }
     }
-    */
 }

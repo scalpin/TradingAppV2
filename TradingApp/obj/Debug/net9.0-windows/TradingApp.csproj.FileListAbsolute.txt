@@ -33,3 +33,12 @@ C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\Tradin
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\obj\Debug\net9.0-windows\TradingApp.csproj.Up2Date
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\obj\Debug\net9.0-windows\TradingApp.sourcelink.json
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Google.Api.CommonProtos.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Grpc.Net.ClientFactory.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.Http.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.Logging.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.Options.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.Primitives.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Tinkoff.InvestApi.dll

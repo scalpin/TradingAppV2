@@ -32,5 +32,11 @@ namespace TradingApp
             // Мы отправляем запрос на создание заявки
             await _ordersViewModel.PlaceTestOrder();
         }
+
+        private async void ShowOrderBookCommand_Click(object sender, RoutedEventArgs e)
+        {
+            await _ordersViewModel.GetOrderBookAsync();
+        }
+
     }
 }
