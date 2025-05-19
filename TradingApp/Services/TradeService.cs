@@ -129,11 +129,10 @@ public class TradeService
     /// <summary>
     /// Подписывается на real‑time стакан по FIGI, вызывает onUpdate при каждом обновлении
     /// </summary>
-    public async Task SubscribeOrderBookAsync(
-        string figi,
-        int depth,
-        Action<OrderBook> onUpdate,
-        CancellationToken cancellationToken = default)
+    public async Task SubscribeAndLogOrderBookAsync(
+       string figi,
+       int depth,
+       CancellationToken cancellationToken = default)
     {
         var call = _client.MarketDataStream.MarketDataStream();
 
@@ -143,33 +142,40 @@ public class TradeService
             SubscribeOrderBookRequest = new SubscribeOrderBookRequest
             {
                 SubscriptionAction = SubscriptionAction.Subscribe,
-                Instruments =
-                {
-                    new OrderBookInstrument
-                    {
-                        Figi = figi,
-                        Depth = depth
-                    }
-                }
+                Instruments = { new OrderBookInstrument { Figi = figi, Depth = depth } }
             }
         });
 
-        // параллельно слушаем ответы
+        // слушаем и логируем
         _ = Task.Run(async () =>
         {
             try
             {
-                await foreach (var response in call.ResponseStream.ReadAllAsync(cancellationToken))
+                await foreach (var resp in call.ResponseStream.ReadAllAsync(cancellationToken))
                 {
-                    if (response.PayloadCase == MarketDataResponse.PayloadOneofCase.Orderbook)
+                    if (resp.PayloadCase != MarketDataResponse.PayloadOneofCase.Orderbook)
+                        continue;
+
+                    var ob = resp.Orderbook;
+                    var sb = new StringBuilder();
+                    sb.AppendLine("=== BIDS ===");
+                    foreach (var b in ob.Bids)
                     {
-                        onUpdate(response.Orderbook);
+                        var price = b.Price.Units + b.Price.Nano / 1_000_000_000.0;
+                        sb.AppendLine($"Bid: {price} x {b.Quantity}");
                     }
+                    sb.AppendLine("=== ASKS ===");
+                    foreach (var a in ob.Asks)
+                    {
+                        var price = a.Price.Units + a.Price.Nano / 1_000_000_000.0;
+                        sb.AppendLine($"Ask: {price} x {a.Quantity}");
+                    }
+                    System.Diagnostics.Debug.WriteLine(sb.ToString());
                 }
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
             {
-                // нормальное завершение
+                // отмена — молча уходим
             }
         }, cancellationToken);
     }

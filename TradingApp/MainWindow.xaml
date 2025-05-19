@@ -8,11 +8,9 @@
                 Padding="10,5" Click="SendButton_Click" Margin="0,133,0,0"/>
         <Button Content="Получить стакан SBER"
                 Click="ShowOrderBookCommand_Click"
-                Command="{Binding ShowOrderBookCommand}"
                 Margin="265,182,265,152" Height="30" Width="150"/>
         <Button Content="Включить подписку на стакан SBER"
                 Click="StartOrderBook_Click"
-                Command="{Binding ShowOrderBookCommand}"
                 Margin="237,231,237,103" Height="30"/>
     </Grid>
 </Window>
