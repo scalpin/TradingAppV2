@@ -38,5 +38,11 @@ namespace TradingApp
             await _ordersViewModel.GetOrderBookAsync();
         }
 
+        private async void StartOrderBook_Click(object sender, RoutedEventArgs e)
+        {
+            await _ordersViewModel.StartOrderBook();
+        }
+
+
     }
 }

@@ -124,4 +124,53 @@ public class TradeService
             System.Diagnostics.Debug.WriteLine($"Ошибка при получении стакана: {ex.Message}");
         }
     }
+
+
+    /// <summary>
+    /// Подписывается на real‑time стакан по FIGI, вызывает onUpdate при каждом обновлении
+    /// </summary>
+    public async Task SubscribeOrderBookAsync(
+        string figi,
+        int depth,
+        Action<OrderBook> onUpdate,
+        CancellationToken cancellationToken = default)
+    {
+        var call = _client.MarketDataStream.MarketDataStream();
+
+        // отправляем подписку
+        await call.RequestStream.WriteAsync(new MarketDataRequest
+        {
+            SubscribeOrderBookRequest = new SubscribeOrderBookRequest
+            {
+                SubscriptionAction = SubscriptionAction.Subscribe,
+                Instruments =
+                {
+                    new OrderBookInstrument
+                    {
+                        Figi = figi,
+                        Depth = depth
+                    }
+                }
+            }
+        });
+
+        // параллельно слушаем ответы
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await foreach (var response in call.ResponseStream.ReadAllAsync(cancellationToken))
+                {
+                    if (response.PayloadCase == MarketDataResponse.PayloadOneofCase.Orderbook)
+                    {
+                        onUpdate(response.Orderbook);
+                    }
+                }
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+            {
+                // нормальное завершение
+            }
+        }, cancellationToken);
+    }
 }
