@@ -42,3 +42,4 @@ C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\Tradin
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.Options.dll
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Microsoft.Extensions.Primitives.dll
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\bin\Debug\net9.0-windows\Tinkoff.InvestApi.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs

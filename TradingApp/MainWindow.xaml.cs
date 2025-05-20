@@ -13,36 +13,105 @@ using System.Text.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TradingApp.ViewModels;
+using System.Collections.ObjectModel;
+using TradingApp.Services;
 
 namespace TradingApp
 {
     public partial class MainWindow : Window
     {
-        private readonly OrdersViewModel _ordersViewModel;
+        private readonly TradeService _tradeService;
+        private readonly SettingsService _settingsService;
+        private CancellationTokenSource? _orderBookCts;
+
+        // коллекции для DataGrid'ов
+        private readonly ObservableCollection<OrderBookRow> _bids = new();
+        private readonly ObservableCollection<OrderBookRow> _asks = new();
 
         public MainWindow()
         {
             InitializeComponent();
-            _ordersViewModel = new OrdersViewModel();
-            DataContext = _ordersViewModel; // связываем с ViewModel
+
+            // инициализируем TradeService
+            var settings = new SettingsService();
+            _tradeService = new TradeService(settings);
+            _settingsService = new SettingsService();
+
+            // заполнить ComboBox тикерами
+            TickerComboBox.ItemsSource = new[] { "SBER", "MTLR" };
+            TickerComboBox.SelectedIndex = 0; // сразу выберет SBER
+
+            // привязать DataGrid'ы к коллекциям
+            BidsGrid.ItemsSource = _bids;
+            AsksGrid.ItemsSource = _asks;
+
+            // повесить обработчик выбора тикера
+            TickerComboBox.SelectionChanged += TickerComboBox_SelectionChanged;
+
+            // запустить стакан для первого выбранного
+            StartOrderBookFor((string)TickerComboBox.SelectedItem!);
         }
 
-        private async void SendButton_Click(object sender, RoutedEventArgs e)
+        public class OrderBookRow
         {
-            // Мы отправляем запрос на создание заявки
-            await _ordersViewModel.PlaceTestOrder();
+            public double Price { get; set; }
+            public long Quantity { get; set; }
         }
 
-        private async void ShowOrderBookCommand_Click(object sender, RoutedEventArgs e)
+        private void TickerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            await _ordersViewModel.GetOrderBookAsync();
+            if (TickerComboBox.SelectedItem is string ticker)
+                StartOrderBookFor(ticker);
         }
 
-        private async void StartOrderBook_Click(object sender, RoutedEventArgs e)
+        private async void StartOrderBookFor(string ticker)
         {
-            await _ordersViewModel.StartOrderBook();
+            // отменяем предыдущую подписку
+            _orderBookCts?.Cancel();
+            _orderBookCts = new CancellationTokenSource();
+
+            // получаем FIGI
+            var figi = _settingsService.GetFigiByTicker(ticker);
+            if (figi == null) return;
+
+            // запускаем real‑time подписку
+            await _tradeService.SubscribeOrderBookAsync(
+                figi,
+                depth: 20,
+                onUpdate: ob =>
+                {
+                    // обновляем коллекции в UI‑потоке
+                    Dispatcher.Invoke(() =>
+                    {
+                        _bids.Clear();
+                        foreach (var b in ob.Bids)
+                        {
+                            _bids.Add(new OrderBookRow
+                            {
+                                Price = b.Price.Units + b.Price.Nano / 1e9,
+                                Quantity = b.Quantity
+                            });
+                        }
+
+                        _asks.Clear();
+                        foreach (var a in ob.Asks)
+                        {
+                            _asks.Add(new OrderBookRow
+                            {
+                                Price = a.Price.Units + a.Price.Nano / 1e9,
+                                Quantity = a.Quantity
+                            });
+                        }
+                    });
+                },
+                cancellationToken: _orderBookCts.Token
+            );
         }
 
-
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            // отменить подписку при закрытии
+            _orderBookCts?.Cancel();
+        }
     }
 }

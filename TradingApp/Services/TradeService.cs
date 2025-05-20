@@ -88,8 +88,9 @@ public class TradeService
     public async Task GetOrderBookAsync(string figi)
     {
         var token = _settings.tToken;
+        var endpoint = ApiEndpoints.PlaceStopOrder;
 
-        var channel = GrpcChannel.ForAddress("https://invest-public-api.tinkoff.ru");
+        var channel = GrpcChannel.ForAddress(endpoint);
         var client = new MarketDataService.MarketDataServiceClient(channel);
 
         var headers = new Grpc.Core.Metadata
@@ -126,27 +127,30 @@ public class TradeService
     }
 
 
-    /// <summary>
-    /// Подписывается на real‑time стакан по FIGI, вызывает onUpdate при каждом обновлении
-    /// </summary>
-    public async Task SubscribeAndLogOrderBookAsync(
-       string figi,
-       int depth,
-       CancellationToken cancellationToken = default)
+ 
+    // Подписывается на real‑time стакан по FIGI, вызывает onUpdate при каждом обновлении
+    public async Task SubscribeOrderBookAsync(
+        string figi,
+        int depth,
+        Action<OrderBook>? onUpdate = null,
+        CancellationToken cancellationToken = default)
     {
         var call = _client.MarketDataStream.MarketDataStream();
 
-        // отправляем подписку
+        // отпрака запроса на подписку
         await call.RequestStream.WriteAsync(new MarketDataRequest
         {
             SubscribeOrderBookRequest = new SubscribeOrderBookRequest
             {
                 SubscriptionAction = SubscriptionAction.Subscribe,
-                Instruments = { new OrderBookInstrument { Figi = figi, Depth = depth } }
+                Instruments =
+                    {
+                        new OrderBookInstrument { Figi = figi, Depth = depth }
+                    }
             }
         });
 
-        // слушаем и логируем
+        // чтение и либо лог, либо колбэк
         _ = Task.Run(async () =>
         {
             try
@@ -157,26 +161,61 @@ public class TradeService
                         continue;
 
                     var ob = resp.Orderbook;
-                    var sb = new StringBuilder();
-                    sb.AppendLine("=== BIDS ===");
-                    foreach (var b in ob.Bids)
+
+                    if (onUpdate != null)
                     {
-                        var price = b.Price.Units + b.Price.Nano / 1_000_000_000.0;
-                        sb.AppendLine($"Bid: {price} x {b.Quantity}");
+                        onUpdate(ob);
                     }
-                    sb.AppendLine("=== ASKS ===");
-                    foreach (var a in ob.Asks)
+                    else
                     {
-                        var price = a.Price.Units + a.Price.Nano / 1_000_000_000.0;
-                        sb.AppendLine($"Ask: {price} x {a.Quantity}");
+                        // стандартный лог
+                        var sb = new StringBuilder();
+                        sb.AppendLine("=== BIDS ===");
+                        foreach (var b in ob.Bids)
+                        {
+                            var price = b.Price.Units + b.Price.Nano / 1e9;
+                            sb.AppendLine($"Bid: {price} x {b.Quantity}");
+                        }
+                        sb.AppendLine("=== ASKS ===");
+                        foreach (var a in ob.Asks)
+                        {
+                            var price = a.Price.Units + a.Price.Nano / 1e9;
+                            sb.AppendLine($"Ask: {price} x {a.Quantity}");
+                        }
+                        System.Diagnostics.Debug.WriteLine(sb.ToString());
                     }
-                    System.Diagnostics.Debug.WriteLine(sb.ToString());
                 }
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
             {
-                // отмена — молча уходим
+                // норм завершение
             }
         }, cancellationToken);
     }
+
+
+    /*
+    // Возвращает FIGI инструмента по его тикеру и классу (например, "TQBR").
+    public async Task<string?> GetFigiByTickerAsync(string classCode, string ticker)
+    {
+        try
+        {
+            // Получаем список всех акций
+            var resp = await _client.Instruments.StocksAsync(
+                new InstrumentsRequest { InstrumentStatus = InstrumentStatus.InstrumentStatusAll });
+
+            // Находим по тикеру
+            var instr = resp.Instruments
+                            .FirstOrDefault(i => string.Equals(i.Ticker, ticker, StringComparison.OrdinalIgnoreCase)
+                                              && string.Equals(i.ClassCode, classCode, StringComparison.OrdinalIgnoreCase));
+
+            return instr?.Figi;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Не удалось получить FIGI: {ex.Message}");
+            return null;
+        }
+    }
+    */
 }

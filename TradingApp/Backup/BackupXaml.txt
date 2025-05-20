@@ -1,0 +1,38 @@
+<Window x:Class="TradingApp.Backup"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FinamBot" Height="400" Width="700">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- для первой кнопки -->
+            <RowDefinition Height="Auto"/>
+            <!-- для второй -->
+            <RowDefinition Height="Auto"/>
+            <!-- для третьей -->
+            <RowDefinition Height="*"/>
+            <!-- остальное место -->
+        </Grid.RowDefinitions>
+
+        <Button Grid.Row="0"
+                Content="Получить деньги"
+                HorizontalAlignment="Center"
+                Padding="10,5"
+                Click="SendButton_Click"
+                Margin="0,10"/>
+
+        <Button Grid.Row="1"
+                Content="Получить стакан SBER"
+                HorizontalAlignment="Center"
+                Padding="10,5"
+                Click="ShowOrderBookCommand_Click"
+                Margin="0,10"/>
+
+        <Button Grid.Row="2"
+                Content="Включить подписку на стакан SBER"
+                HorizontalAlignment="Center"
+                Padding="10,5"
+                Click="StartOrderBook_Click"
+                Margin="0,10"/>
+    </Grid>
+</Window>

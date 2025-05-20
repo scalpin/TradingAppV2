@@ -9,5 +9,7 @@ namespace TradingApp.Constants
     public static class ApiEndpoints
     {
         public const string PlaceStopOrder = "https://trade-api.finam.ru/api/v1/stops";
+
+        public const string GetOrderBook = "https://invest-public-api.tinkoff.ru";
     }
 }

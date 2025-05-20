@@ -1,0 +1,111 @@
+using System;
+using System.Windows;
+using System.Windows.Input;
+using System.Threading.Tasks;
+using System.Text;
+using TradingApp.Services;
+using TradingApp.Helpers;
+using Tinkoff.InvestApi.V1;
+using System.Collections.ObjectModel;
+
+namespace TradingApp.ViewModels
+{
+    public class OrdersViewModel
+    {
+        private readonly TradeService _tradeService;
+        private CancellationTokenSource? _orderBookCts;
+
+        // коллекция тикеров в интерфейсе
+        public ObservableCollection<string> AvailableTickers { get; }
+            = new ObservableCollection<string> { "SBER" };
+
+        public ICommand ShowOrderBookCommand { get; }
+
+        public ICommand PlaceOrderCommand { get; }
+
+        public ICommand StartOrderBookCommand { get; }
+        public ICommand StopOrderBookCommand { get; }
+
+        public OrdersViewModel()
+        {
+            var settings = new SettingsService();
+            _tradeService = new TradeService(settings);
+
+            PlaceOrderCommand = new RelayCommand(async _ => await PlaceTestOrder());
+
+
+            StartOrderBookCommand = new RelayCommand(async _ => await StartOrderBook());
+            StopOrderBookCommand = new RelayCommand(async _ => StopOrderBook());
+        }
+
+        // Тейкпрофит
+        public async Task PlaceTestOrder()
+        {
+            await _tradeService.PlaceTakeProfitOrderAsync("TQBR", "MTLR", 500);
+        }
+
+        // фотка стакана
+        public async Task GetOrderBookAsync()
+        {
+            await _tradeService.GetOrderBookAsync("BBG004730N88");
+        }
+
+        // подписка на стакан
+        public async Task StartOrderBook()
+        {
+            _orderBookCts?.Cancel();
+            _orderBookCts = new CancellationTokenSource();
+            await _tradeService.SubscribeAndLogOrderBookAsync(
+                figi: "BBG004730N88",
+                depth: 20,
+                cancellationToken: _orderBookCts.Token);
+        }
+
+        // остановка подписки
+        public void StopOrderBook()
+        {
+            _orderBookCts?.Cancel();
+            _orderBookCts = null;
+        }
+
+        // переводит тикер в figi и перезапускает стакан
+        private async void StartOrderBookFor(string ticker)
+        {
+            _orderBookCts?.Cancel();
+            _orderBookCts = new CancellationTokenSource();
+
+            var figi = await _tradeService.GetFigiByTickerAsync("TQBR", ticker);
+            if (figi == null) return;
+
+            await _tradeService.SubscribeAndLogOrderBookAsync(
+                figi, 10,
+                ob =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Bids.Clear();
+                        foreach (var b in ob.Bids)
+                            Bids.Add(new OrderBookRow { Price = b.Price.Units + b.Price.Nano / 1e9, Quantity = b.Quantity });
+
+                        Asks.Clear();
+                        foreach (var a in ob.Asks)
+                            Asks.Add(new OrderBookRow { Price = a.Price.Units + a.Price.Nano / 1e9, Quantity = a.Quantity });
+                    });
+                },
+                _orderBookCts.Token);
+        }
+
+        private string _selectedTicker;
+        public string SelectedTicker
+        {
+            get => _selectedTicker;
+            set
+            {
+                if (_selectedTicker == value) return;
+                _selectedTicker = value;
+                OnPropertyChanged();  // если реализуешь INotifyPropertyChanged
+                StartOrderBookFor(value);
+            }
+        }
+    }
+}

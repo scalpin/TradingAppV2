@@ -1,0 +1,50 @@
+    public async Task SubscribeAndLogOrderBookAsync(
+       string figi,
+       int depth,
+       CancellationToken cancellationToken = default)
+    {
+        var call = _client.MarketDataStream.MarketDataStream();
+
+        // отправл€ем подписку
+        await call.RequestStream.WriteAsync(new MarketDataRequest
+        {
+            SubscribeOrderBookRequest = new SubscribeOrderBookRequest
+            {
+                SubscriptionAction = SubscriptionAction.Subscribe,
+                Instruments = { new OrderBookInstrument { Figi = figi, Depth = depth } }
+            }
+        });
+
+        // слушаем и логируем
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await foreach (var resp in call.ResponseStream.ReadAllAsync(cancellationToken))
+                {
+                    if (resp.PayloadCase != MarketDataResponse.PayloadOneofCase.Orderbook)
+                        continue;
+
+                    var ob = resp.Orderbook;
+                    var sb = new StringBuilder();
+                    sb.AppendLine("=== BIDS ===");
+                    foreach (var b in ob.Bids)
+                    {
+                        var price = b.Price.Units + b.Price.Nano / 1_000_000_000.0;
+                        sb.AppendLine($"Bid: {price} x {b.Quantity}");
+                    }
+                    sb.AppendLine("=== ASKS ===");
+                    foreach (var a in ob.Asks)
+                    {
+                        var price = a.Price.Units + a.Price.Nano / 1_000_000_000.0;
+                        sb.AppendLine($"Ask: {price} x {a.Quantity}");
+                    }
+                    System.Diagnostics.Debug.WriteLine(sb.ToString());
+                }
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+            {
+                // отмена Ч молча уходим
+            }
+        }, cancellationToken);
+    }
