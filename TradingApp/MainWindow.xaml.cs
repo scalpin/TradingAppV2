@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using TradingApp.ViewModels;
 using System.Collections.ObjectModel;
 using TradingApp.Services;
+using Google.Api;
 
 namespace TradingApp
 {
@@ -23,6 +24,7 @@ namespace TradingApp
         private readonly TradeService _tradeService;
         private readonly SettingsService _settingsService;
         private CancellationTokenSource? _orderBookCts;
+        private OrderBookScreenerService _screenerService;
 
         // коллекции для DataGrid'ов
         private readonly ObservableCollection<OrderBookRow> _bids = new();
@@ -108,10 +110,28 @@ namespace TradingApp
             );
         }
 
+
+
+
         private void Window_Closed(object sender, EventArgs e)
         {
             // отменить подписку при закрытии
             _orderBookCts?.Cancel();
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var settings = new SettingsService();
+
+            // Запуск скриннера
+            _screenerService = new OrderBookScreenerService(_tradeService.MarketDataStreamClient, settings);
+            await _screenerService.StartAsync();
+
+
+            // вызов функции для получения среднего объёма
+            double avg10 = await _screenerService.GetAverageVolumePer10MinAsync(code: "SBER");
+            System.Diagnostics.Debug.WriteLine(avg10);
+
         }
     }
 }

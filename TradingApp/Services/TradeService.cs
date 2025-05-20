@@ -22,6 +22,7 @@ public class TradeService
     private readonly HttpClient _httpClient;
     private readonly SettingsService _settings;
     private readonly InvestApiClient _client;
+    public MarketDataStreamService.MarketDataStreamServiceClient MarketDataStreamClient => _client.MarketDataStream;
 
     public TradeService(SettingsService settingsService)
     {
