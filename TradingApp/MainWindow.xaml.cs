@@ -40,7 +40,7 @@ namespace TradingApp
             _settingsService = new SettingsService();
 
             // заполнить ComboBox тикерами
-            TickerComboBox.ItemsSource = new[] { "SBER", "MTLR" };
+            TickerComboBox.ItemsSource = new[] { "SBER", "MTLR", "GAZP", "LKOH" };
             TickerComboBox.SelectedIndex = 0; // сразу выберет SBER
 
             // привязать DataGrid'ы к коллекциям
@@ -126,12 +126,6 @@ namespace TradingApp
             // Запуск скриннера
             _screenerService = new OrderBookScreenerService(_tradeService.MarketDataStreamClient, settings);
             await _screenerService.StartAsync();
-
-
-            // вызов функции для получения среднего объёма
-            double avg10 = await _screenerService.GetAverageVolumePer10MinAsync(code: "SBER");
-            System.Diagnostics.Debug.WriteLine(avg10);
-
         }
     }
 }

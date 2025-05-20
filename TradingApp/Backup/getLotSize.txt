@@ -1,0 +1,28 @@
+    public async Task<int?> GetLotSizeAsync(string securityCode, string? board = null)
+    {
+        // Собираем URL
+        var url = $"https://trade-api.finam.ru/api/v1/securities?Seccode={Uri.EscapeDataString(securityCode)}";
+
+        var resp = await _http.GetAsync(url);
+        resp.EnsureSuccessStatusCode();
+        using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+
+        var secs = doc.RootElement
+                      .GetProperty("data")
+                      .GetProperty("securities")
+                      .EnumerateArray();
+
+        // Если указан board, ищем именно его, иначе — первый
+        var match = board != null
+            ? secs.FirstOrDefault(e => e.GetProperty("board").GetString()?.Equals(board, StringComparison.OrdinalIgnoreCase) == true)
+            : secs.FirstOrDefault();
+
+        if (match.ValueKind == JsonValueKind.Undefined)
+            return null;
+
+        // Параметр lotSize
+        if (match.TryGetProperty("lotSize", out var lotProp) && lotProp.TryGetInt32(out var lotSize))
+            return lotSize;
+
+        return null;
+    }

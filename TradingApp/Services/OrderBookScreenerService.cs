@@ -18,6 +18,7 @@ using static Google.Rpc.Context.AttributeContext.Types;
 using System.IO;
 using System.Diagnostics;
 using System.Buffers.Text;
+using TradingApp.Helpers;
 
 public class OrderBookScreenerService
 {
@@ -37,30 +38,36 @@ public class OrderBookScreenerService
         // Жестко заданные инструменты
         _figiToTicker = new Dictionary<string, string>
         {
-            { "BBG004730N88", "MTLR" },
-            { "BBG004S68598", "SBER" }
+            { "BBG004S68598", "MTLR" },
+            { "BBG004730N88", "SBER" },
+            { "BBG004730RP0", "GAZP" },
+            { "BBG004731032", "LKOH" },
         };
         _settings = settings;
     }
 
-    // Кусок скриннера (слушает все стаканы из массива)
+    /*
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
         var call = _streamClient.MarketDataStream();
 
-        // Подписка сразу на все нужные стаканы
         await call.RequestStream.WriteAsync(new MarketDataRequest
         {
             SubscribeOrderBookRequest = new SubscribeOrderBookRequest
             {
                 SubscriptionAction = SubscriptionAction.Subscribe,
                 Instruments =
-                {
-                    new OrderBookInstrument { Figi = "BBG004730N88", Depth = 20 },
-                    new OrderBookInstrument { Figi = "BBG004S68598", Depth = 20 }
-                }
+            {
+                new OrderBookInstrument{Figi="BBG004S68598",Depth=20},
+                new OrderBookInstrument{Figi="BBG004730N88",Depth=20},
+                new OrderBookInstrument{Figi="BBG004730RP0",Depth=20},
+                new OrderBookInstrument{Figi="BBG004731032",Depth=20}
+            }
             }
         });
+
+        DateTime lastRestCall = DateTime.MinValue;
+        TimeSpan restInterval = TimeSpan.FromSeconds(1);
 
         _ = Task.Run(async () =>
         {
@@ -74,15 +81,128 @@ public class OrderBookScreenerService
                     var ob = resp.Orderbook;
                     var ticker = _figiToTicker.GetValueOrDefault(ob.Figi) ?? ob.Figi;
 
-                    if (ob.Bids.Count > 0)
-                    {
-                        var bestBid = ob.Bids[0];
-                        var price = bestBid.Price.Units + bestBid.Price.Nano / 1e9;
+                    // Работа по каждому сообщению — лёгкая синхронная логика
+                    var bestBid = ob.Bids.FirstOrDefault();
+                    if (bestBid is null)
+                        continue;
 
-                        if (bestBid.Quantity > 30000)
+                    var price = bestBid.Price.Units + bestBid.Price.Nano / 1e9;
+
+                    // Лимитируем вызов REST‑функции по времени
+                    if (DateTime.UtcNow - lastRestCall >= restInterval)
+                    {
+                        lastRestCall = DateTime.UtcNow;
+
+                        // здесь ты вызываешь тяжёлую работу, например GetAverageVolumePer10MinAsync
+                        double avg10 = await GetAverageVolumePer10MinAsync(ticker);
+
+                        // проверка уже с avg10
+                        var lotSize = _settings.GetLotSize(ticker);
+                        double? density = bestBid.Quantity * lotSize * price;
+
+                        if (density > avg10)
+                            Debug.WriteLine($"[СКРИННЕР] {ticker}: плотность {density:F0} > {avg10:F0}");
+                    }
+                    else  // для логирования лёгкой работы
+                    {
+                        if (bestBid.Quantity > 100)
+                            Debug.WriteLine($"[СКРИННЕР] {ticker}: жирная покупка {price} x {bestBid.Quantity}");
+                    }
+                }
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+            {
+                Debug.WriteLine("Скриннер остановлен (отмена токена)");
+            }
+        }, cancellationToken);
+    }
+    */
+
+
+    public async Task StartAsync(CancellationToken cancellationToken = default)
+    {
+        var call = _streamClient.MarketDataStream();
+
+        await call.RequestStream.WriteAsync(new MarketDataRequest
+        {
+            SubscribeOrderBookRequest = new SubscribeOrderBookRequest
+            {
+                SubscriptionAction = SubscriptionAction.Subscribe,
+                Instruments =
+            {
+                new OrderBookInstrument{Figi="BBG004S68598",Depth=20},
+                new OrderBookInstrument{Figi="BBG004730N88",Depth=20},
+                new OrderBookInstrument{Figi="BBG004730RP0",Depth=20},
+                new OrderBookInstrument{Figi="BBG004731032",Depth=20}
+            }
+            }
+        });
+
+        DateTime lastRestCall = DateTime.MinValue;
+        TimeSpan restInterval = TimeSpan.FromSeconds(1);
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await foreach (var resp in call.ResponseStream.ReadAllAsync(cancellationToken))
+                {
+                    if (resp.PayloadCase != MarketDataResponse.PayloadOneofCase.Orderbook)
+                        continue;
+
+                    var ob = resp.Orderbook;
+                    var ticker = _figiToTicker.GetValueOrDefault(ob.Figi) ?? ob.Figi;
+
+                    // Работа по каждому сообщению — лёгкая синхронная логика
+                    var bestBid = ob.Bids.FirstOrDefault();
+                    if (bestBid is null)
+                        continue;
+
+                    //   var price = bestBid.Price.Units + bestBid.Price.Nano / 1e9; //
+
+                    // Лимитируем вызов REST‑функции по времени
+                    if (DateTime.UtcNow - lastRestCall >= restInterval)
+                    {
+                        lastRestCall = DateTime.UtcNow;
+
+                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker);
+                        var lotSize = _settings.GetLotSize(ticker);
+                        //double? density = bestBid.Quantity * lotSize * price;
+
+                        foreach (var lvl in ob.Bids)
                         {
-                            System.Diagnostics.Debug.WriteLine($"[СКРИННЕР] {ticker}: жирная покупка по {price} x {bestBid.Quantity}");
+                            long qty = lvl.Quantity;
+                            double priceDouble = lvl.Price.Units + lvl.Price.Nano / 1_000_000_000.0;
+
+                            double? density = qty * lotSize * priceDouble;
+
+                            if (density >= avgVolume)
+                            {
+                                Debug.WriteLine(
+                                    $"[СКРИННЕР] {ticker} BID‑кластер: {lvl.Quantity} лотов по цене {lvl.Price}");
+                            }
                         }
+
+                        // И каждый уровень Ask
+                        foreach (var lvl in ob.Asks)
+                        {
+                            long qty = lvl.Quantity;
+                            double priceDouble = lvl.Price.Units + lvl.Price.Nano / 1_000_000_000.0;
+
+                            double? density = qty * lotSize * priceDouble;
+
+                            if (density >= avgVolume)
+                            {
+                                Debug.WriteLine(
+                                    $"[СКРИННЕР] {ticker} BID‑кластер: {lvl.Quantity} лотов по цене {lvl.Price}");
+                            }
+                        }
+
+                    }
+                    else  // для логирования лёгкой работы
+                    {
+                        //if (bestBid.Quantity > 100)
+                        //    Debug.WriteLine($"[СКРИННЕР] {ticker}: жирная покупка {price} x {bestBid.Quantity}");
                     }
                 }
             }
@@ -94,7 +214,7 @@ public class OrderBookScreenerService
     }
 
 
-    // Возвращает средний объём за 5 минут по инструменту (сканирует все свечи по дню)
+    // Возвращает средний объём за 30 минут по инструменту (сканирует все свечи по дню)
     public async Task<double> GetAverageVolumePer10MinAsync(string code)
     {
         const string CandlesEndpoint = ApiEndpoints.Candles;
@@ -150,7 +270,7 @@ public class OrderBookScreenerService
 
         double totalMinutes = candleCount * minutesPerCandle;
         double avgPerMinute = totalVolume * lastPrice / totalMinutes;
-        return avgPerMinute * 10.0;
+        return avgPerMinute * 30.0;
     }
 
     // Вспомогательный: из "M15" → 15 минут, "M5" → 5 и т.д.
@@ -164,5 +284,5 @@ public class OrderBookScreenerService
         // при необходимости добавить H1 → 60, D1 → 1440 и т.д.
         return 0;
     }
-    
+
 }

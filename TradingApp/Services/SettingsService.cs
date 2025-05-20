@@ -16,12 +16,11 @@ namespace TradingApp.Services
         private readonly Dictionary<string, string> _tickerToFigi = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "SBER", "BBG004730N88" },
-            { "GAZP", "BBG000C6K6G9" },
-            { "LKOH", "BBG004770R77" },
+            { "GAZP", "BBG004730RP0" },
+            { "LKOH", "BBG004731032" },
             { "MTLR", "BBG004S68598" },
-            // добавить остальные тикеры по необходимости
+            // добавить остальные тикеры
         };
-
         // возвращает figi по тикеру
         public string? GetFigiByTicker(string ticker)
         {
@@ -30,6 +29,24 @@ namespace TradingApp.Services
 
             _tickerToFigi.TryGetValue(ticker.Trim(), out var figi);
             return figi;
+        }
+
+        // Словарь «тикер → размер лота»
+        public static readonly Dictionary<string, int> LotSizes = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["SBER"] = 10,
+            ["GAZP"] = 10,
+            ["LKOH"] = 10,
+            ["MTLR"] = 10,
+            // добавить остальные тикеры
+        };
+        // возвращает размер лота по тикеру
+        public int? GetLotSize(string ticker)
+        {
+            if (string.IsNullOrWhiteSpace(ticker))
+                return 1;
+
+            return LotSizes.TryGetValue(ticker.Trim(), out var size) ? size : 1;
         }
     }
 }
