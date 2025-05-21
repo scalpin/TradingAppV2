@@ -4,52 +4,75 @@
         Title="TradingApp" Height="600" Width="900"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
+    <DockPanel>
 
-    <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Левый блок: выбор тикера -->
-        <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,10,0">
-            <TextBlock Text="Тикер" FontWeight="Bold" Margin="0,0,0,4"/>
-            <ComboBox x:Name="TickerComboBox"
-                Width="150"
-                IsEditable="True"
-                SelectionChanged="TickerComboBox_SelectionChanged"/>
+        <!-- Переключатель режима -->
+        <StackPanel Orientation="Horizontal"
+              DockPanel.Dock="Top"
+              HorizontalAlignment="Left"
+              Margin="10">
+            <ToggleButton x:Name="BtnAuto"
+                  Style="{StaticResource ModeToggleStyle}"
+                  IsChecked="True"
+                  Click="BtnAuto_Click">
+                Автоторговля
+            </ToggleButton>
+            <ToggleButton x:Name="BtnScreener"
+                  Style="{StaticResource ModeToggleStyle}"
+                  Click="BtnScreener_Click">
+                Скриннер
+            </ToggleButton>
         </StackPanel>
 
-        <!-- Правый блок: стакан -->
-        <Grid Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- Здесь будем накладывать две панели друг на друга -->
+        <Grid Margin="10">
+            <!-- Панель автоторговли -->
+            <Grid x:Name="AutotradePanel" Visibility="Visible">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <!-- Твой существующий контент автоторговли -->
+                <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,10,0">
+                    <TextBlock Text="Тикер" FontWeight="Bold" Margin="0,0,0,4"/>
+                    <ComboBox x:Name="TickerComboBox"
+                    Width="150"
+                    IsEditable="True"
+                    SelectionChanged="TickerComboBox_SelectionChanged"/>
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Bids" Grid.Column="0" Margin="0,0,5,0">
+                        <DataGrid x:Name="BidsGrid" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="*"/>
+                                <DataGridTextColumn Header="Объём" Binding="{Binding Quantity}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Header="Asks" Grid.Column="1" Margin="5,0,0,0">
+                        <DataGrid x:Name="AsksGrid" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="*"/>
+                                <DataGridTextColumn Header="Объём" Binding="{Binding Quantity}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+            </Grid>
 
-            <!-- Bids -->
-            <GroupBox Header="Bids" Grid.Column="0" Margin="0,0,5,0">
-                <DataGrid x:Name="BidsGrid"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Цена"   Binding="{Binding Price}"    Width="*"/>
-                        <DataGridTextColumn Header="Объём"   Binding="{Binding Quantity}" Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
-
-            <!-- Asks -->
-            <GroupBox Header="Asks" Grid.Column="1" Margin="5,0,0,0">
-                <DataGrid x:Name="AsksGrid"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Цена"   Binding="{Binding Price}"    Width="*"/>
-                        <DataGridTextColumn Header="Объём"   Binding="{Binding Quantity}" Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
+            <!-- Панель скриннера -->
+            <Grid x:Name="ScreenerPanel" Visibility="Collapsed">
+                <!-- Пока пусто -->
+                <TextBlock Text="Скриннер здесь будет" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"
+                   FontSize="18"/>
+            </Grid>
         </Grid>
-    </Grid>
+
+    </DockPanel>
 </Window>

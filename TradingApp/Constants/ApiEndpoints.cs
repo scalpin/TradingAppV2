@@ -10,6 +10,8 @@ namespace TradingApp.Constants
     {
         public const string PlaceStopOrder = "https://trade-api.finam.ru/api/v1/stops";
 
+        public const string PlaceLimitOrder = "https://trade-api.finam.ru/api/v1/orders";
+
         public const string GetOrderBook = "https://invest-public-api.tinkoff.ru";
 
         public const string Candles = "https://trade-api.finam.ru/api/v1/intraday-candles";

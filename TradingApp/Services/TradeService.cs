@@ -16,6 +16,7 @@ using System.Threading;
 using Grpc.Core;
 using static Google.Rpc.Context.AttributeContext.Types;
 using System.IO;
+using System.Diagnostics;
 
 public class TradeService
 {
@@ -194,29 +195,31 @@ public class TradeService
         }, cancellationToken);
     }
 
-
-    /*
-    // Возвращает FIGI инструмента по его тикеру и классу (например, "TQBR").
-    public async Task<string?> GetFigiByTickerAsync(string classCode, string ticker)
+    public async Task<bool> PlaceLimitOrderAsync(
+    string securityCode,
+    bool isBuy,
+    double price,
+    int quantity
+    )
     {
-        try
+        var endpoint = ApiEndpoints.PlaceLimitOrder;
+        var body = new
         {
-            // Получаем список всех акций
-            var resp = await _client.Instruments.StocksAsync(
-                new InstrumentsRequest { InstrumentStatus = InstrumentStatus.InstrumentStatusAll });
-
-            // Находим по тикеру
-            var instr = resp.Instruments
-                            .FirstOrDefault(i => string.Equals(i.Ticker, ticker, StringComparison.OrdinalIgnoreCase)
-                                              && string.Equals(i.ClassCode, classCode, StringComparison.OrdinalIgnoreCase));
-
-            return instr?.Figi;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Не удалось получить FIGI: {ex.Message}");
-            return null;
-        }
+            clientId = _settings.ClientId,
+            securityBoard = "TQBR",
+            securityCode = securityCode,
+            buySell = isBuy ? "Buy" : "Sell",
+            price = price,
+            quantity = quantity,
+            timeInForce = "FillOrKill",
+            property = "PutInQueue"
+        };
+        var json = JsonSerializer.Serialize(body);
+        var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+        var resp = await _httpClient.PostAsync(endpoint, content);
+        if (resp.IsSuccessStatusCode) return true;
+        var err = await resp.Content.ReadAsStringAsync();
+        Debug.WriteLine($"Order error: {resp.StatusCode} / {err}");
+        return false;
     }
-    */
 }

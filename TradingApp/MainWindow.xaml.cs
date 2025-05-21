@@ -112,6 +112,14 @@ namespace TradingApp
 
 
 
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var settings = new SettingsService();
+
+            // Запуск скриннера
+            _screenerService = new OrderBookScreenerService(_tradeService.MarketDataStreamClient, settings, _tradeService);
+            await _screenerService.StartAsync();
+        }
 
         private void Window_Closed(object sender, EventArgs e)
         {
@@ -119,13 +127,43 @@ namespace TradingApp
             _orderBookCts?.Cancel();
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        /*
+        private void ModeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var settings = new SettingsService();
+            if (AutotradePanel == null || ScreenerPanel == null)
+            {
+                return;
+            }
 
-            // Запуск скриннера
-            _screenerService = new OrderBookScreenerService(_tradeService.MarketDataStreamClient, settings);
-            await _screenerService.StartAsync();
+            if (ModeSelector.SelectedIndex == 0)
+            {
+                AutotradePanel.Visibility = System.Windows.Visibility.Visible;
+                ScreenerPanel.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                AutotradePanel.Visibility = System.Windows.Visibility.Collapsed;
+                ScreenerPanel.Visibility = System.Windows.Visibility.Visible;
+            }
+        }
+        */
+
+        private void BtnAuto_Click(object sender, RoutedEventArgs e)
+        {
+            BtnAuto.IsChecked = true;
+            BtnScreener.IsChecked = false;
+
+            AutotradePanel.Visibility = System.Windows.Visibility.Visible;
+            ScreenerPanel.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        private void BtnScreener_Click(object sender, RoutedEventArgs e)
+        {
+            BtnAuto.IsChecked = false;
+            BtnScreener.IsChecked = true;
+
+            AutotradePanel.Visibility = System.Windows.Visibility.Collapsed;
+            ScreenerPanel.Visibility = System.Windows.Visibility.Visible;
         }
     }
 }

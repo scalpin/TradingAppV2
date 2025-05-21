@@ -19,6 +19,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Buffers.Text;
 using TradingApp.Helpers;
+using System.IO.Pipelines;
 
 public class OrderBookScreenerService
 {
@@ -26,11 +27,13 @@ public class OrderBookScreenerService
     private readonly Dictionary<string, string> _figiToTicker;
     private readonly HttpClient _http = new HttpClient();
     private readonly SettingsService _settings;
+    private readonly TradeService _tradeService;
 
-    public OrderBookScreenerService(MarketDataStreamService.MarketDataStreamServiceClient streamClient, SettingsService settings)
+    public OrderBookScreenerService(MarketDataStreamService.MarketDataStreamServiceClient streamClient, SettingsService settings, TradeService tradeService)
     {
         _streamClient = streamClient;
         _settings = settings;
+        _tradeService = tradeService;
 
         _http = new HttpClient();
         _http.DefaultRequestHeaders.Add("X-Api-Key", _settings.fToken);
@@ -131,15 +134,15 @@ public class OrderBookScreenerService
                 Instruments =
             {
                 new OrderBookInstrument{Figi="BBG004S68598",Depth=20},
-                new OrderBookInstrument{Figi="BBG004730N88",Depth=20},
-                new OrderBookInstrument{Figi="BBG004730RP0",Depth=20},
-                new OrderBookInstrument{Figi="BBG004731032",Depth=20}
+                //new OrderBookInstrument{Figi="BBG004730N88",Depth=20},
+                //new OrderBookInstrument{Figi="BBG004730RP0",Depth=20},
+                //new OrderBookInstrument{Figi="BBG004731032",Depth=20}
             }
             }
         });
 
         DateTime lastRestCall = DateTime.MinValue;
-        TimeSpan restInterval = TimeSpan.FromSeconds(1);
+        TimeSpan restInterval = TimeSpan.FromSeconds(2);
 
         _ = Task.Run(async () =>
         {
@@ -176,10 +179,21 @@ public class OrderBookScreenerService
 
                             double? density = qty * lotSize * priceDouble;
 
-                            if (density >= avgVolume)
+                            if (density >= avgVolume/11)
                             {
+                                // лимитка купить на ценовом уровне выше кластера (+ шаг)
+                                var buyPrice = priceDouble + 0.01; //_settings.TickSize;
+                                var buyLots = 1; // или сколько надо лотов
+                                _ = _tradeService.PlaceLimitOrderAsync(
+                                      securityCode: ticker,
+                                      price: buyPrice,
+                                      quantity: buyLots,
+                                      isBuy: true);
+
                                 Debug.WriteLine(
-                                    $"[СКРИННЕР] {ticker} BID‑кластер: {lvl.Quantity} лотов по цене {lvl.Price}");
+                                    $"[СКРИННЕР] {ticker} BID‑кластер: {lvl.Quantity} лотов по цене {priceDouble}");
+
+                                return;
                             }
                         }
 

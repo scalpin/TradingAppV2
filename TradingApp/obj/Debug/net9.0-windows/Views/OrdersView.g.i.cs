@@ -52,7 +52,7 @@ namespace TradingApp.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/TradingApp;V1.0.0.0;component/views/ordersview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/TradingApp;component/views/ordersview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\OrdersView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
