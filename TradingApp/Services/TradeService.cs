@@ -19,6 +19,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Threading.Channels;
 using System.Windows.Controls;
+using OrderModel = TradingApp.Models.Order;
 
 public class TradeService
 {
@@ -98,9 +99,9 @@ public class TradeService
         var client = new MarketDataService.MarketDataServiceClient(channel);
 
         var headers = new Grpc.Core.Metadata
-    {
-        { "Authorization", $"Bearer {token}" }
-    };
+        {
+            { "Authorization", $"Bearer {token}" }
+        };
 
         try
         {
@@ -197,6 +198,46 @@ public class TradeService
         }, cancellationToken);
     }
 
+    // Возвращает массив с данными о последней заявке
+    public async Task<List<OrderModel>> GetActiveOrdersAsync()
+    {
+        var url = $"https://trade-api.finam.ru/api/v1/orders" +
+                  $"?ClientId={_settings.ClientId}" +
+                  $"&IncludeMatched=false&IncludeCanceled=false&IncludeActive=true";
+        var resp = await _httpClient.GetAsync(url);
+        var raw = await resp.Content.ReadAsStringAsync();
+        Debug.WriteLine($"[GetActiveOrders] {resp.StatusCode} {raw}");
+        resp.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(raw);
+        var root = doc.RootElement.GetProperty("data");
+
+        if (!root.TryGetProperty("orders", out var arrEl)
+            || arrEl.ValueKind != JsonValueKind.Array)
+        {
+            Debug.WriteLine("[GetActiveOrders] orders не найден или не массив");
+            return new();
+        }
+
+        var list = new List<OrderModel>();
+        foreach (var el in arrEl.EnumerateArray())
+        {
+            list.Add(new OrderModel
+            {
+                OrderNo = el.GetProperty("orderNo").GetInt64(),
+                TransactionId = el.GetProperty("transactionId").GetInt64(),
+                SecurityCode = el.GetProperty("securityCode").GetString()!,
+                SecurityBoard = el.GetProperty("securityBoard").GetString()!,
+                BuySell = el.GetProperty("buySell").GetString()!,
+                Price = el.GetProperty("price").GetDouble(),
+                Quantity = el.GetProperty("quantity").GetInt32(),
+                Status = el.GetProperty("status").GetString()!
+            });
+        }
+        return list;
+    }
+
+
     /* 
     //Лимитная заявка (возвращает true/false)
     public async Task<bool> PlaceLimitOrderAsync(
@@ -230,14 +271,15 @@ public class TradeService
     }
     */
 
-    //Лимитная заявка (возвращает OrderId)
-    public async Task<string?> PlaceLimitOrderAsync(
-    string securityCode,
-    bool isBuy,
-    double price,
-    int quantity
+    //Лимитная заявка (возвращает TransactionId)
+    public async Task<long> PlaceLimitOrderAsync(
+        string securityCode,
+        bool isBuy,
+        double price,
+        int quantity
     )
     {
+        // 1) выставляем заявку
         var endpoint = ApiEndpoints.PlaceLimitOrder;
         var body = new
         {
@@ -248,29 +290,58 @@ public class TradeService
             price = price,
             quantity = quantity,
             useCredit = true,
-            timeInForce = "FillOrKill",
+            timeInForce = "Day",
             property = "PutInQueue"
         };
+
         var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
-        var resp = await _httpClient.PostAsync(endpoint, content);
-
+        var resp = await _httpClient.PostAsync(endpoint,
+                             new StringContent(json, Encoding.UTF8, "application/json-patch+json"));
         var respBody = await resp.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(respBody);
-        var orderId = doc.RootElement.GetProperty("data").GetProperty("orderId").GetString(); // тема для получения orderId
+        if (!resp.IsSuccessStatusCode)
+        {
+            Debug.WriteLine($"Order error: {resp.StatusCode} / {respBody}");
+            return 0;
+        }
 
-        if (resp.IsSuccessStatusCode)
-            return orderId;
-        var err = await resp.Content.ReadAsStringAsync();
-        Debug.WriteLine($"Order error: {resp.StatusCode} / {err}");
-        return null;
+        // 2) даём API секунду на появление
+        await Task.Delay(500);
+
+        // 3) запрашиваем список активных ордеров
+        var all = await GetActiveOrdersAsync();
+
+        // 4) ищем последний ордер с такими же параметрами
+        var match = all
+            .Where(o => o.SecurityCode == securityCode
+                     && o.BuySell == (isBuy ? "Buy" : "Sell")
+                     && Math.Abs(o.Price - price) < 1e-9
+                     && o.Quantity == quantity
+                     && o.Status == "Active"   // или какой статус актуален
+                  )
+            .OrderByDescending(o => o.TransactionId) // или по какому-то другому полю времени
+            .FirstOrDefault();
+
+        if (match == null)
+        {
+            Debug.WriteLine("Не удалось найти новый ордер в списке");
+            return 0;
+        }
+
+        Debug.WriteLine($"Found new TransactionId = {match.TransactionId}");
+        return match.TransactionId;
     }
 
-    public async Task<bool> CancelOrderAsync(string orderId)
+    public async Task<bool> CancelOrderAsync(long transactionId)
     {
-        var url = string.Format(ApiEndpoints.DeleteOrder, orderId, _settings.ClientId);
+        // Собираем URL точно по образцу из Swagger
+        var url = $"{ApiEndpoints.DeleteOrder}" +
+                  $"?ClientId={_settings.ClientId}" +
+                  $"&TransactionId={transactionId}";
+
         var resp = await _httpClient.DeleteAsync(url);
-        if (resp.IsSuccessStatusCode) return true;
+        if (resp.IsSuccessStatusCode)
+            return true;
+
         var err = await resp.Content.ReadAsStringAsync();
         Debug.WriteLine($"CancelOrder error: {resp.StatusCode} / {err}");
         return false;

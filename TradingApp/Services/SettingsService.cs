@@ -32,6 +32,7 @@ namespace TradingApp.Services
             { "HYDR", "BBG00475K2X9" },
             { "SVCB", "BBG000FR4JW2" },
             { "MTSS", "BBG004S681W1" },
+            { "SIBN", "BBG004S684M6" },
         };
         public string? GetFigiByTicker(string ticker)
         {
@@ -62,6 +63,7 @@ namespace TradingApp.Services
             ["HYDR"] = 1000,
             ["SVCB"] = 100,
             ["MTSS"] = 10,
+            ["SIBN"]= 1,
         };
         public int? GetLotSize(string ticker)
         {
@@ -91,6 +93,7 @@ namespace TradingApp.Services
             ["HYDR"] = 0.0001,
             ["SVCB"] = 0.005,
             ["MTSS"] = 0.05,
+            ["SIBN"] = 0.05,
         };
         public double GetTickSize(string ticker)
         {

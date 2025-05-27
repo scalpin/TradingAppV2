@@ -16,6 +16,6 @@ namespace TradingApp.Constants
 
         public const string Candles = "https://trade-api.finam.ru/api/v1/intraday-candles";
 
-        public const string DeleteOrder = "https://trade-api.finam.ru/api/v1/orders/{0}?ClientId={1}";
+        public const string DeleteOrder = "https://trade-api.finam.ru/api/v1/orders";
     }
 }
