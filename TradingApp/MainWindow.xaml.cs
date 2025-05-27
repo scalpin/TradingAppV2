@@ -40,7 +40,7 @@ namespace TradingApp
             _settingsService = new SettingsService();
 
             // заполнить ComboBox тикерами
-            TickerComboBox.ItemsSource = new[] { "SBER", "MTLR", "GAZP", "LKOH" };
+            TickerComboBox.ItemsSource = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT" };
             TickerComboBox.SelectedIndex = 0; // сразу выберет SBER
 
             // привязать DataGrid'ы к коллекциям

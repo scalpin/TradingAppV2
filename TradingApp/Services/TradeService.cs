@@ -17,6 +17,8 @@ using Grpc.Core;
 using static Google.Rpc.Context.AttributeContext.Types;
 using System.IO;
 using System.Diagnostics;
+using System.Threading.Channels;
+using System.Windows.Controls;
 
 public class TradeService
 {
@@ -90,7 +92,7 @@ public class TradeService
     public async Task GetOrderBookAsync(string figi)
     {
         var token = _settings.tToken;
-        var endpoint = ApiEndpoints.PlaceStopOrder;
+        var endpoint = ApiEndpoints.GetOrderBook;
 
         var channel = GrpcChannel.ForAddress(endpoint);
         var client = new MarketDataService.MarketDataServiceClient(channel);
@@ -195,6 +197,8 @@ public class TradeService
         }, cancellationToken);
     }
 
+    /* 
+    //Лимитная заявка (возвращает true/false)
     public async Task<bool> PlaceLimitOrderAsync(
     string securityCode,
     bool isBuy,
@@ -211,15 +215,65 @@ public class TradeService
             buySell = isBuy ? "Buy" : "Sell",
             price = price,
             quantity = quantity,
+            useCredit = true,
             timeInForce = "FillOrKill",
             property = "PutInQueue"
         };
         var json = JsonSerializer.Serialize(body);
         var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
         var resp = await _httpClient.PostAsync(endpoint, content);
-        if (resp.IsSuccessStatusCode) return true;
+        if (resp.IsSuccessStatusCode) 
+            return true;
         var err = await resp.Content.ReadAsStringAsync();
         Debug.WriteLine($"Order error: {resp.StatusCode} / {err}");
         return false;
     }
+    */
+
+    //Лимитная заявка (возвращает OrderId)
+    public async Task<string?> PlaceLimitOrderAsync(
+    string securityCode,
+    bool isBuy,
+    double price,
+    int quantity
+    )
+    {
+        var endpoint = ApiEndpoints.PlaceLimitOrder;
+        var body = new
+        {
+            clientId = _settings.ClientId,
+            securityBoard = "TQBR",
+            securityCode = securityCode,
+            buySell = isBuy ? "Buy" : "Sell",
+            price = price,
+            quantity = quantity,
+            useCredit = true,
+            timeInForce = "FillOrKill",
+            property = "PutInQueue"
+        };
+        var json = JsonSerializer.Serialize(body);
+        var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+        var resp = await _httpClient.PostAsync(endpoint, content);
+
+        var respBody = await resp.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(respBody);
+        var orderId = doc.RootElement.GetProperty("data").GetProperty("orderId").GetString(); // тема для получения orderId
+
+        if (resp.IsSuccessStatusCode)
+            return orderId;
+        var err = await resp.Content.ReadAsStringAsync();
+        Debug.WriteLine($"Order error: {resp.StatusCode} / {err}");
+        return null;
+    }
+
+    public async Task<bool> CancelOrderAsync(string orderId)
+    {
+        var url = string.Format(ApiEndpoints.DeleteOrder, orderId, _settings.ClientId);
+        var resp = await _httpClient.DeleteAsync(url);
+        if (resp.IsSuccessStatusCode) return true;
+        var err = await resp.Content.ReadAsStringAsync();
+        Debug.WriteLine($"CancelOrder error: {resp.StatusCode} / {err}");
+        return false;
+    }
+
 }
