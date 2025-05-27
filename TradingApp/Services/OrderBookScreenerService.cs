@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Buffers.Text;
 using TradingApp.Helpers;
 using System.IO.Pipelines;
+using System.Transactions;
 
 public class OrderBookScreenerService
 {
@@ -140,8 +141,8 @@ public class OrderBookScreenerService
 
                                 // лимитка купить на ценовом уровне выше кластера (+ шаг)
                                 var buyPrice = priceDouble + _settings.GetTickSize(ticker);
-                                var buyLots = 1; // или сколько надо лотов
-                                var TransactionId = await _tradeService.PlaceLimitOrderAsync( // ставит заявку и возвращает orderId
+                                var buyLots = 1;
+                                var TransactionId = await _tradeService.PlaceLimitOrderAsync( // ставит заявку и возвращает TransactionId
                                       securityCode: ticker,
                                       price: buyPrice,
                                       quantity: buyLots,
@@ -149,7 +150,19 @@ public class OrderBookScreenerService
 
                                 if (TransactionId != 0)
                                 {
-                                    await MonitorOrderAsync(ob.Figi, priceDouble, Convert.ToInt64(lvl.Quantity / 2), TransactionId);
+                                    //Запускает слежку по объёму кластера
+                                    bool isMatched = await MonitorOrderAsync(ob.Figi, priceDouble, Convert.ToInt64(lvl.Quantity / 2), TransactionId);
+
+                                    // проверяет, исполнилась ли заявка
+                                    if (isMatched)
+                                    {
+                                        Debug.WriteLine($"[AUTO] Order {TransactionId} is matched – continue process");
+                                        // Здесь вызов следующей функции //
+                                    }
+                                    else
+                                    {
+                                        Debug.WriteLine($"[AUTO] Order {TransactionId} is cancelled, finish");
+                                    }
                                 }
 
                                 return;
@@ -167,17 +180,23 @@ public class OrderBookScreenerService
 
                             if (density >= avgVolume)
                             {
+                                Debug.WriteLine($"[СКРИННЕР] {ticker} ASK‑кластер: {lvl.Quantity} лотов по цене {priceDouble}");
+
                                 // лимитка продать на ценовом уровне выше кластера (- шаг)
                                 var buyPrice = priceDouble - _settings.GetTickSize(ticker); 
                                 var buyLots = 1; // или сколько надо лотов
-                                _ = _tradeService.PlaceLimitOrderAsync(
+                                var TransactionId = await _tradeService.PlaceLimitOrderAsync( // ставит заявку и возвращает TransactionId
                                       securityCode: ticker,
                                       price: buyPrice,
                                       quantity: buyLots,
                                       isBuy: false);
 
-                                Debug.WriteLine(
-                                    $"[СКРИННЕР] {ticker} ASK‑кластер: {lvl.Quantity} лотов по цене {priceDouble}");
+                                if (TransactionId != 0)
+                                {
+                                    await MonitorOrderAsync(ob.Figi, priceDouble, Convert.ToInt64(lvl.Quantity / 2), TransactionId);
+
+
+                                }
 
                                 return;
                             }
@@ -271,89 +290,8 @@ public class OrderBookScreenerService
         return 0;
     }
 
-
-
-    // Слежка за объёмом на одном уровне стакана. Как только общий объём
-    // на уровне <paramref name="price"/> упадёт ниже <paramref name="minLots"/>,
-    // заявка <paramref name="TransactionId"/> будет отозвана, и слежка прекратится.
-
-    /* Рабочая слежка за целевой ценой
-    public async Task MonitorOrderAsync(
-        string figi,
-        double price,
-        long minLots,
-        long TransactionId,
-        CancellationToken ct = default)
-    {
-        var call = _streamClient.MarketDataStream();
-
-        await call.RequestStream.WriteAsync(new MarketDataRequest
-        {
-            SubscribeOrderBookRequest = new SubscribeOrderBookRequest
-            {
-                SubscriptionAction = SubscriptionAction.Subscribe,
-                Instruments =
-            {
-                new OrderBookInstrument { Figi = figi, Depth = 20 }
-            }
-            }
-        });
-
-        try
-        {
-            await foreach (var resp in call.ResponseStream.ReadAllAsync(ct))
-            {
-                if (resp.PayloadCase != MarketDataResponse.PayloadOneofCase.Orderbook)
-                    continue;
-
-                var ob = resp.Orderbook;
-
-                // сначала проверяем Bids
-                foreach (var lvl in ob.Bids)
-                {
-                    var lvlPrice = lvl.Price.Units + lvl.Price.Nano / 1e9;
-                    if (Math.Abs(lvlPrice - price) < 1e-9)
-                    {
-                        // если лотов стало меньше minLots — отменяем и уходим
-                        if (lvl.Quantity < minLots)
-                        {
-                            await _tradeService.CancelOrderAsync(TransactionId);
-                            Debug.WriteLine($"[MONITOR] Cancelled order {TransactionId} on {figi} @ {price}");
-                            return;
-                        }
-                        // иначе — всё ещё надёжно, ждём следующий стакан
-                        goto NextSnapshot;
-                    }
-                }
-
-                // затем Asks
-                foreach (var lvl in ob.Asks)
-                {
-                    var lvlPrice = lvl.Price.Units + lvl.Price.Nano / 1e9;
-                    if (Math.Abs(lvlPrice - price) < 1e-9)
-                    {
-                        if (lvl.Quantity < minLots)
-                        {
-                            await _tradeService.CancelOrderAsync(TransactionId);
-                            Debug.WriteLine($"[MONITOR] Cancelled order {TransactionId} on {figi} @ {price}");
-                            return;
-                        }
-                        goto NextSnapshot;
-                    }
-                }
-
-            NextSnapshot:
-                ; // метка для продолжения await foreach
-            }
-        }
-        catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
-        {
-            Debug.WriteLine("MonitorOrderAsync cancelled by token");
-        }
-    }
-    */
-
-    public async Task MonitorOrderAsync(
+    //Рабочая слежка за целевой ценой
+    public async Task<bool> MonitorOrderAsync(
     string figi,
     double price,
     long minLots,
@@ -388,7 +326,10 @@ public class OrderBookScreenerService
                 if (!stillActive)
                 {
                     Debug.WriteLine($"[MONITOR] Order {transactionId} no longer active – stop monitoring");
-                    return;
+                    // либо исполнена, либо отменена
+                    var matched = (await _tradeService.GetMatchedOrdersAsync())
+                        .Any(o => o.TransactionId == transactionId);
+                    return matched;
                 }
 
                 if (resp.PayloadCase != MarketDataResponse.PayloadOneofCase.Orderbook)
@@ -400,7 +341,6 @@ public class OrderBookScreenerService
                 var bidLvl = ob.Bids.FirstOrDefault(lvl =>
                 {
                     var lvlPrice = lvl.Price.Units + lvl.Price.Nano / 1e9;
-                    //return Math.Abs(lvlPrice - price) <= tol;
                     return lvlPrice == price;
                 });
 
@@ -411,7 +351,7 @@ public class OrderBookScreenerService
                     {
                         await _tradeService.CancelOrderAsync(transactionId);
                         Debug.WriteLine($"[MONITOR] Cancelled order {transactionId} on {figi} @ {price}");
-                        return;
+                        return false;
                     }
                     // иначе — уровень ещё держится, ждём следующий снимок
                     continue;
@@ -421,7 +361,7 @@ public class OrderBookScreenerService
                 var askLvl = ob.Asks.FirstOrDefault(lvl =>
                 {
                     var lvlPrice = lvl.Price.Units + lvl.Price.Nano / 1e9;
-                    return Math.Abs(lvlPrice - price) <= tol;
+                    return lvlPrice == price;
                 });
 
                 if (askLvl != null)
@@ -430,16 +370,18 @@ public class OrderBookScreenerService
                     {
                         await _tradeService.CancelOrderAsync(transactionId);
                         Debug.WriteLine($"[MONITOR] Cancelled order {transactionId} on {figi} @ {price}");
-                        return;
+                        return false;
                     }
                 }
 
                 // если уровень не найден ни в Bids, ни в Asks — просто ждём пока появится
             }
+            return false;
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
         {
             Debug.WriteLine("MonitorOrderAsync cancelled by token");
+            return false;
         }
     }
 }

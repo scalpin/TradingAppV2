@@ -198,7 +198,7 @@ public class TradeService
         }, cancellationToken);
     }
 
-    // Возвращает массив с данными о последней заявке
+    // Возвращает массив с данными об активных заявках
     public async Task<List<OrderModel>> GetActiveOrdersAsync()
     {
         var url = $"https://trade-api.finam.ru/api/v1/orders" +
@@ -237,39 +237,44 @@ public class TradeService
         return list;
     }
 
-
-    /* 
-    //Лимитная заявка (возвращает true/false)
-    public async Task<bool> PlaceLimitOrderAsync(
-    string securityCode,
-    bool isBuy,
-    double price,
-    int quantity
-    )
+    // Возвращает массив с данными об исполненных заявках
+    public async Task<List<OrderModel>> GetMatchedOrdersAsync()
     {
-        var endpoint = ApiEndpoints.PlaceLimitOrder;
-        var body = new
+        var url = $"https://trade-api.finam.ru/api/v1/orders" +
+                  $"?ClientId={_settings.ClientId}" +
+                  $"&IncludeMatched=true&IncludeCanceled=false&IncludeActive=false";
+        var resp = await _httpClient.GetAsync(url);
+        var raw = await resp.Content.ReadAsStringAsync();
+        Debug.WriteLine($"[GetMatchedOrders] {resp.StatusCode} {raw}");
+        resp.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(raw);
+        var root = doc.RootElement.GetProperty("data");
+
+        if (!root.TryGetProperty("orders", out var arrEl)
+            || arrEl.ValueKind != JsonValueKind.Array)
         {
-            clientId = _settings.ClientId,
-            securityBoard = "TQBR",
-            securityCode = securityCode,
-            buySell = isBuy ? "Buy" : "Sell",
-            price = price,
-            quantity = quantity,
-            useCredit = true,
-            timeInForce = "FillOrKill",
-            property = "PutInQueue"
-        };
-        var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
-        var resp = await _httpClient.PostAsync(endpoint, content);
-        if (resp.IsSuccessStatusCode) 
-            return true;
-        var err = await resp.Content.ReadAsStringAsync();
-        Debug.WriteLine($"Order error: {resp.StatusCode} / {err}");
-        return false;
+            Debug.WriteLine("[GetMatchedOrders] orders не найден или не массив");
+            return new();
+        }
+
+        var list = new List<OrderModel>();
+        foreach (var el in arrEl.EnumerateArray())
+        {
+            list.Add(new OrderModel
+            {
+                OrderNo = el.GetProperty("orderNo").GetInt64(),
+                TransactionId = el.GetProperty("transactionId").GetInt64(),
+                SecurityCode = el.GetProperty("securityCode").GetString()!,
+                SecurityBoard = el.GetProperty("securityBoard").GetString()!,
+                BuySell = el.GetProperty("buySell").GetString()!,
+                Price = el.GetProperty("price").GetDouble(),
+                Quantity = el.GetProperty("quantity").GetInt32(),
+                Status = el.GetProperty("status").GetString()!
+            });
+        }
+        return list;
     }
-    */
 
     //Лимитная заявка (возвращает TransactionId)
     public async Task<long> PlaceLimitOrderAsync(
