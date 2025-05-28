@@ -60,6 +60,7 @@ public class OrderBookScreenerService
             { "BBG000FR4JW2", "SVCB" },
             { "BBG004S681W1", "MTSS" },
             { "BBG004S684M6", "SIBN" },
+            { "BBG004RVFFC0", "TATN" },
         };
         _settings = settings;
     }
@@ -94,6 +95,7 @@ public class OrderBookScreenerService
                     //new OrderBookInstrument{Figi="BBG004730RP0",Depth=20}, // GAZP
                     //new OrderBookInstrument{Figi="BBG004731032",Depth=20}, // LKOH
                     //new OrderBookInstrument{Figi="BBG004S684M6",Depth=20}, // SIBN
+                    //new OrderBookInstrument{Figi="BBG004RVFFC0",Depth=20}, // TATN
                 }
             }
         });
@@ -123,9 +125,10 @@ public class OrderBookScreenerService
                     {
                         lastRestCall = DateTime.UtcNow;
 
-                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker);
+                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker)/7;
                         var lotSize = _settings.GetLotSize(ticker);
                         
+
                         // Проходит каждый уровень Bid
                         foreach (var lvl in ob.Bids)
                         {
@@ -133,7 +136,6 @@ public class OrderBookScreenerService
                             double priceDouble = lvl.Price.Units + lvl.Price.Nano / 1_000_000_000.0;
 
                             double? density = qty * lotSize * priceDouble;
-                            avgVolume = avgVolume/2;
 
                             if (density >= avgVolume)
                             {
@@ -353,16 +355,22 @@ public class OrderBookScreenerService
         });
 
         // допустимая погрешность сравнения цен
-        var tol = _settings.GetTickSize(figi);
+        //var tol = _settings.GetTickSize(figi);
+        var lastCheckTime = DateTime.MinValue; // Время последнего запроса
+        bool isOrderActive = true; // Кешированный статус заявки
 
         try
         {
             await foreach (var resp in call.ResponseStream.ReadAllAsync(ct))
             {
                 // 1) Сначала проверяем, остался ли ордер активным
-                var activeOrders = await _tradeService.GetActiveOrdersAsync();
-                bool stillActive = activeOrders.Any(o => o.TransactionId == transactionId);
-                if (!stillActive)
+                if ((DateTime.UtcNow - lastCheckTime).TotalSeconds >= 1.5)
+                {
+                    lastCheckTime = DateTime.UtcNow;
+                    var activeOrders = await _tradeService.GetActiveOrdersAsync();
+                    isOrderActive = activeOrders.Any(o => o.TransactionId == transactionId);
+                }
+                if (!isOrderActive)
                 {
                     Debug.WriteLine($"[MONITOR] Order {transactionId} no longer active – stop monitoring");
                     // либо исполнена, либо отменена
@@ -450,15 +458,21 @@ public class OrderBookScreenerService
         });
 
         var ticker = _settings.GetTickerByFigi(figi);
+        var lastCheckTime = DateTime.MinValue; // Время последнего запроса
+        bool isOrderActive = true; // Кешированный статус заявки
 
         try
         {
             await foreach (var resp in call.ResponseStream.ReadAllAsync(ct))
             {
                 // 1) Сначала проверяем, остался ли ордер активным
-                var activeOrders = await _tradeService.GetActiveOrdersAsync();
-                bool stillActive = activeOrders.Any(o => o.TransactionId == transactionId2);
-                if (!stillActive)
+                if ((DateTime.UtcNow - lastCheckTime).TotalSeconds >= 1.5)
+                {
+                    lastCheckTime = DateTime.UtcNow;
+                    var activeOrders = await _tradeService.GetActiveOrdersAsync();
+                    isOrderActive = activeOrders.Any(o => o.TransactionId == transactionId2);
+                }
+                if (!isOrderActive)
                 {
                     Debug.WriteLine($"[MONITOR] Order {transactionId2} no longer active – stop monitoring");
                     return;
@@ -486,6 +500,7 @@ public class OrderBookScreenerService
                             quantity: buyLots,
                             isBuy: isBuy);
                         Debug.WriteLine($"[MONITOR] Закрыта позиция {transactionId2} on {figi} @ {price}");
+                        await _tradeService.CancelOrderAsync(transactionId2); // отменяем заявку на фикс прибыли
                         return;
                     }
                     // иначе — уровень ещё держится, ждём следующий снимок
@@ -508,6 +523,7 @@ public class OrderBookScreenerService
                             quantity: buyLots,
                             isBuy: isBuy);
                         Debug.WriteLine($"[MONITOR] Закрыта позиция {transactionId2} on {figi} @ {price}");
+                        await _tradeService.CancelOrderAsync(transactionId2);
                         return;
                     }
                 }
