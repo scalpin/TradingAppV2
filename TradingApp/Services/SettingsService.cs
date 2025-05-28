@@ -43,6 +43,19 @@ namespace TradingApp.Services
             return figi;
         }
 
+        public string? GetTickerByFigi(string figi)
+        {
+            if (string.IsNullOrWhiteSpace(figi))
+                return null;
+
+            var figiToTicker = _tickerToFigi
+                .ToDictionary(kv => kv.Value, kv => kv.Key, StringComparer.OrdinalIgnoreCase);
+
+            figiToTicker.TryGetValue(figi.Trim(), out var ticker);
+            return ticker;
+        }
+
+
         // Словарь «тикер -> размер лота»
         public static readonly Dictionary<string, int> LotSizes = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
         {

@@ -336,6 +336,37 @@ public class TradeService
         return match.TransactionId;
     }
 
+    public async Task PlaceMarketOrderAsync(
+        string securityCode,
+        int quantity,
+        bool isBuy)
+    {
+        const string board = "TQBR";
+        var endpoint = ApiEndpoints.PlaceLimitOrder; 
+
+        var body = new
+        {
+            clientId = _settings.ClientId,
+            securityBoard = board,
+            securityCode = securityCode,
+            buySell = isBuy ? "Buy" : "Sell",
+            quantity = quantity,
+            useCredit = true,
+            property = "PutInQueue"
+        };
+
+        var json = JsonSerializer.Serialize(body);
+        var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+        var resp = await _httpClient.PostAsync(endpoint, content);
+        var raw = await resp.Content.ReadAsStringAsync();
+
+        if (!resp.IsSuccessStatusCode)
+        {
+            Debug.WriteLine($"[PlaceMarketOrder] Ошибка: {resp.StatusCode} / {raw}");
+        }
+    }
+
     public async Task<bool> CancelOrderAsync(long transactionId)
     {
         // Собираем URL точно по образцу из Swagger
