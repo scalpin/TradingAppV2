@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace TradingApp.Models
 {
-    class Security
+    public class Security
     {
+        public string FinamToken { get; set; } = "";
+        public string TinkoffToken { get; set; } = "";
+        public string FinamClientId { get; set; } = "";
     }
 }

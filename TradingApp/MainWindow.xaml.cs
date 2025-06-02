@@ -21,6 +21,8 @@ namespace TradingApp
 {
     public partial class MainWindow : Window
     {
+        private string currentView = "Autotrade"; // По умолчанию "Автоторговля"
+
         private readonly TradeService _tradeService;
         private readonly SettingsService _settingsService;
         private CancellationTokenSource? _orderBookCts;
@@ -173,6 +175,8 @@ namespace TradingApp
             AutotradeView.Visibility = System.Windows.Visibility.Visible;
             SettingsView.Visibility = System.Windows.Visibility.Collapsed;
             ScreenerView.Visibility = System.Windows.Visibility.Collapsed;
+            SwitcherPanel.Visibility = System.Windows.Visibility.Visible;
+            currentView = "Autotrade";
         }
 
         private void BtnScreener_Click(object sender, RoutedEventArgs e)
@@ -183,6 +187,8 @@ namespace TradingApp
             AutotradeView.Visibility = System.Windows.Visibility.Collapsed;
             SettingsView.Visibility = System.Windows.Visibility.Collapsed;
             ScreenerView.Visibility = System.Windows.Visibility.Visible;
+            SwitcherPanel.Visibility = System.Windows.Visibility.Visible;
+            currentView = "Screener";
         }
 
         private void SettingsIcon_MouseLeftButtonDown(object sender, RoutedEventArgs e)
@@ -190,7 +196,27 @@ namespace TradingApp
             AutotradeView.Visibility = System.Windows.Visibility.Collapsed;
             ScreenerView.Visibility = System.Windows.Visibility.Collapsed;
             SettingsView.Visibility = System.Windows.Visibility.Visible;
+
+            MainHeaderPanel.Visibility = System.Windows.Visibility.Collapsed;
+            SettingsHeaderPanel.Visibility = System.Windows.Visibility.Visible;
         }
-        
+
+        public void BtnBack_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentView == "Autotrade")
+            {
+                AutotradeView.Visibility = System.Windows.Visibility.Visible;
+                ScreenerView.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else if (currentView == "Screener")
+            {
+                AutotradeView.Visibility = System.Windows.Visibility.Collapsed;
+                ScreenerView.Visibility = System.Windows.Visibility.Visible;
+            }
+            SettingsView.Visibility = System.Windows.Visibility.Collapsed;
+
+            MainHeaderPanel.Visibility = System.Windows.Visibility.Visible;
+            SettingsHeaderPanel.Visibility = System.Windows.Visibility.Collapsed;
+        }
     }
 }

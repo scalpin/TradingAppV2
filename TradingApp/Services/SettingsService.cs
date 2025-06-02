@@ -2,15 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.IO;
+using TradingApp.Models;
 
 namespace TradingApp.Services
 {
     public class SettingsService
     {
-        public string fToken { get; set; } = "CAEQ36PDCBoYphIlMaaXcYzx2Wpl2nvUx+/juue4k0AR";
-        public string tToken { get; set; } = "t.fvdclBoZKw_MlDraPaWfM7gVlzhybv4-_hSItZLyQEIDuXW7r8jNBlWBbAi4kwDQpLlyl6PX3EMhZ5edlpKx5A";
-        public string ClientId { get; set; } = "707190RBMU2";
+        private const string FilePath = "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\TradingApp\\TradingApp\\Services\\settings.json";
+
+        public AppSettings Settings { get; private set; }
+
+        public SettingsService()
+        {
+            System.Diagnostics.Debug.WriteLine("Рабочая директория: " + Environment.CurrentDirectory);
+            System.Diagnostics.Debug.WriteLine("Путь к конфигу: " + Path.GetFullPath(FilePath));
+
+            Settings = Load();
+        }
+
+        private AppSettings Load()
+        {
+            if (!File.Exists(FilePath))
+                return new AppSettings();
+
+            var json = File.ReadAllText(FilePath);
+            return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+        }
+
+        public void Save()
+        {
+            var json = JsonSerializer.Serialize(Settings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(FilePath, json);
+        }
+
+
+
+
+        //public string fToken { get; set; } = "CAEQ36PDCBoYphIlMaaXcYzx2Wpl2nvUx+/juue4k0AR";
+        //public string tToken { get; set; } = "t.fvdclBoZKw_MlDraPaWfM7gVlzhybv4-_hSItZLyQEIDuXW7r8jNBlWBbAi4kwDQpLlyl6PX3EMhZ5edlpKx5A";
+        //public string ClientId { get; set; } = "707190RBMU2";
 
         // Словарь «тикер → FIGI»
         private readonly Dictionary<string, string> _tickerToFigi = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

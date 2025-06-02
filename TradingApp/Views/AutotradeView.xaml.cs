@@ -31,28 +31,26 @@ namespace TradingApp
         private readonly ObservableCollection<OrderBookRow> _bids = new();
         private readonly ObservableCollection<OrderBookRow> _asks = new();
 
+        private readonly string[] _tickers = { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT" };
+
         public AutotradeView()
         {
             InitializeComponent();
 
-            // инициализируем TradeService
-            var settings = new SettingsService();
-            _tradeService = new TradeService(settings);
             _settingsService = new SettingsService();
+            _tradeService = new TradeService(_settingsService);
 
-            // заполнить ComboBox тикерами
-            TickerComboBox.ItemsSource = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT" };
-            TickerComboBox.SelectedIndex = 0; // сразу выберет SBER
+            TickerListBox.ItemsSource = _tickers;
+            TickerListBox.SelectionChanged += TickerListBox_SelectionChanged;
 
-            // привязать DataGrid'ы к коллекциям
             BidsGrid.ItemsSource = _bids;
             AsksGrid.ItemsSource = _asks;
 
-            // повесить обработчик выбора тикера
-            TickerComboBox.SelectionChanged += TickerComboBox_SelectionChanged;
+            // Выбираем первый тикер сразу
+            TickerListBox.SelectedIndex = 0;
 
             // запустить стакан для первого выбранного
-            StartOrderBookFor((string)TickerComboBox.SelectedItem!);
+            StartOrderBookFor((string)TickerListBox.SelectedItem!);
         }
 
         public class OrderBookRow
@@ -61,9 +59,9 @@ namespace TradingApp
             public long Quantity { get; set; }
         }
 
-        private void TickerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TickerListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TickerComboBox.SelectedItem is string ticker)
+            if (TickerListBox.SelectedItem is string ticker)
                 StartOrderBookFor(ticker);
         }
 

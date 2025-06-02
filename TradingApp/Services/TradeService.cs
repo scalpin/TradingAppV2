@@ -34,8 +34,8 @@ public class TradeService
         _settings = settingsService;
 
         // Добавляем заголовок с токеном при инициализации
-        _httpClient.DefaultRequestHeaders.Add("X-Api-Key", _settings.fToken);
-        _client = InvestApiClientFactory.Create(_settings.tToken);
+        _httpClient.DefaultRequestHeaders.Add("X-Api-Key", _settings.Settings.fToken);
+        _client = InvestApiClientFactory.Create(_settings.Settings.tToken);
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
     }
 
@@ -46,7 +46,7 @@ public class TradeService
 
         var requestBody = new
         {
-            clientId = _settings.ClientId,
+            clientId = _settings.Settings.ClientId,
             securityBoard = board,
             securityCode = code,
             buySell = "Buy",
@@ -92,7 +92,7 @@ public class TradeService
     // получение фотки стакана из тинькоффа (работает)
     public async Task GetOrderBookAsync(string figi)
     {
-        var token = _settings.tToken;
+        var token = _settings.Settings.tToken;
         var endpoint = ApiEndpoints.GetOrderBook;
 
         var channel = GrpcChannel.ForAddress(endpoint);
@@ -202,7 +202,7 @@ public class TradeService
     public async Task<List<OrderModel>> GetActiveOrdersAsync()
     {
         var url = $"https://trade-api.finam.ru/api/v1/orders" +
-                  $"?ClientId={_settings.ClientId}" +
+                  $"?ClientId={_settings.Settings.ClientId}" +
                   $"&IncludeMatched=false&IncludeCanceled=false&IncludeActive=true";
         var resp = await _httpClient.GetAsync(url);
         var raw = await resp.Content.ReadAsStringAsync();
@@ -241,7 +241,7 @@ public class TradeService
     public async Task<List<OrderModel>> GetMatchedOrdersAsync()
     {
         var url = $"https://trade-api.finam.ru/api/v1/orders" +
-                  $"?ClientId={_settings.ClientId}" +
+                  $"?ClientId={_settings.Settings.ClientId}" +
                   $"&IncludeMatched=true&IncludeCanceled=false&IncludeActive=false";
         var resp = await _httpClient.GetAsync(url);
         var raw = await resp.Content.ReadAsStringAsync();
@@ -288,7 +288,7 @@ public class TradeService
         var endpoint = ApiEndpoints.PlaceLimitOrder;
         var body = new
         {
-            clientId = _settings.ClientId,
+            clientId = _settings.Settings.ClientId,
             securityBoard = "TQBR",
             securityCode = securityCode,
             buySell = isBuy ? "Buy" : "Sell",
@@ -346,7 +346,7 @@ public class TradeService
 
         var body = new
         {
-            clientId = _settings.ClientId,
+            clientId = _settings.Settings.ClientId,
             securityBoard = board,
             securityCode = securityCode,
             buySell = isBuy ? "Buy" : "Sell",
@@ -371,7 +371,7 @@ public class TradeService
     {
         // Собираем URL точно по образцу из Swagger
         var url = $"{ApiEndpoints.DeleteOrder}" +
-                  $"?ClientId={_settings.ClientId}" +
+                  $"?ClientId={_settings.Settings.ClientId}" +
                   $"&TransactionId={transactionId}";
 
         var resp = await _httpClient.DeleteAsync(url);

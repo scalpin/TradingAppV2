@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET9_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\App.xaml
-5-1709980960
-
-25-877384434
+4-1727745836
+1-1493912956
+261047740049
 214-2123164831
-MainWindow.xaml;Resources\Styles.xaml;Views\AutotradeView.xaml;Views\ScreenerView.xaml;Views\SettingsView.xaml;
+MainWindow.xaml;Views\AutotradeView.xaml;Views\ScreenerView.xaml;Views\SettingsView.xaml;
 
-False
+True
 

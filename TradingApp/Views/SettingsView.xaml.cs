@@ -1,17 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Windows;
 using System.Windows.Controls;
+using TradingApp.Services;
 
 namespace TradingApp
 {
     public partial class SettingsView : UserControl
     {
+        private readonly SettingsService _settingsService;
+
         public SettingsView()
         {
-            //InitializeComponent();
+            InitializeComponent();
+
+            _settingsService = new SettingsService();
+            this.DataContext = _settingsService.Settings; 
+        }
+
+        private void SaveSettings_Click(object sender, RoutedEventArgs e)
+        {
+            _settingsService.Save();
+            MessageBox.Show("Настройки сохранены");
         }
     }
 }

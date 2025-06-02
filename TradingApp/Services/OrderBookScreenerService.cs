@@ -37,7 +37,7 @@ public class OrderBookScreenerService
         _tradeService = tradeService;
 
         _http = new HttpClient();
-        _http.DefaultRequestHeaders.Add("X-Api-Key", _settings.fToken);
+        _http.DefaultRequestHeaders.Add("X-Api-Key", _settings.Settings.fToken);
 
         // Жестко заданные инструменты
         _figiToTicker = new Dictionary<string, string>

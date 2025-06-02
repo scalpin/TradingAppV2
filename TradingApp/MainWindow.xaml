@@ -4,34 +4,66 @@
         xmlns:local="clr-namespace:TradingApp"
         Title="TradingApp" Height="600" Width="900"
         Loaded="Window_Loaded"
-        Closed="Window_Closed">
+        Closed="Window_Closed"
+        Background="{StaticResource AppBackground}"
+        Foreground="{StaticResource AppForeground}">
     <DockPanel>
-        <!-- Верхняя панель с переключателем и кнопкой настроек -->
-        <Grid DockPanel.Dock="Top" Margin="10">
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ — Переключалка -->
+        <Grid x:Name="MainHeaderPanel" DockPanel.Dock="Top" 
+              Margin="10" Visibility="Visible"
+              Background="{StaticResource AppBackground}"
+              SnapsToDevicePixels="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center">
+            <StackPanel x:Name="SwitcherPanel" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center" Margin="20 0 0 0">
                 <ToggleButton x:Name="BtnAuto"
-                              Style="{StaticResource ModeToggleStyle}"
-                              IsChecked="True"
-                              Click="BtnAuto_Click">
+                          Style="{StaticResource ModeToggleStyle}"
+                          IsChecked="True"
+                          Click="BtnAuto_Click">
                     Автоторговля
                 </ToggleButton>
                 <ToggleButton x:Name="BtnScreener"
-                              Style="{StaticResource ModeToggleStyle}"
-                              Click="BtnScreener_Click">
+                          Style="{StaticResource ModeToggleStyle}"
+                          Click="BtnScreener_Click">
                     Скриннер
                 </ToggleButton>
             </StackPanel>
-            <Image Source="C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\Resources\static\settings_icon2.png" 
-                   Width="23" Height="23" Grid.Column="2" 
-                   MouseLeftButtonDown="SettingsIcon_MouseLeftButtonDown" Cursor="Hand" />
+            <Image Source="C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\Resources\static\settings_icon3.png" 
+               Width="23" Height="23" Grid.Column="2" 
+               MouseLeftButtonDown="SettingsIcon_MouseLeftButtonDown" Cursor="Hand" />
         </Grid>
 
-        <!-- Основная область с UserControl -->
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ — Шапка настроек -->
+        <Grid x:Name="SettingsHeaderPanel" DockPanel.Dock="Top" Margin="10" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                Width="30"
+                Height="30"
+                Click="BtnBack_Click"
+                Background="Transparent"
+                BorderThickness="0"
+                Cursor="Hand">
+                <Path Data="M 10,0 L 0,10 L 10,20"
+                  Stroke="White"
+                  StrokeThickness="2"
+                  VerticalAlignment="Center"/>
+            </Button>
+            <TextBlock Grid.Column="1"
+                   Text="Настройки"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                       Margin="0 0 30 0"
+                   VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Основной контент -->
         <Grid Margin="10">
             <local:AutotradeView x:Name="AutotradeView" Visibility="Visible"/>
             <local:ScreenerView x:Name="ScreenerView" Visibility="Collapsed"/>

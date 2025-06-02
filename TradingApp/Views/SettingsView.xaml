@@ -1,7 +1,35 @@
-<UserControl x:Class="TradingApp.Views.SettingsView"
-                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
+﻿<UserControl x:Class="TradingApp.SettingsView"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:local="clr-namespace:TradingApp"
+            Background="{StaticResource AppBackground}"
+            Foreground="{StaticResource AppForeground}">
 
-    </Grid>
+    <ScrollViewer>
+        <StackPanel Margin="20" VerticalAlignment="Top">
+
+            <Border Style="{StaticResource SettingsBlock}">
+                <StackPanel>
+                    <TextBlock Text="Авторизация API" Style="{StaticResource SettingsBlockTitle}" />
+
+                    <TextBlock Text="Finam Token" Style="{StaticResource LabelText}" />
+                    <TextBox Text="{Binding fToken, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource SettingsTextBox}" />
+
+                    <TextBlock Text="Tinkoff Token" Style="{StaticResource LabelText}" />
+                    <TextBox Text="{Binding tToken, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource SettingsTextBox}" />
+
+                    <TextBlock Text="Finam Client ID" Style="{StaticResource LabelText}" />
+                    <TextBox Text="{Binding ClientId, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource SettingsTextBox}" />
+
+                    <Button Content="Сохранить" Click="SaveSettings_Click"
+                        Style="{StaticResource PrimaryButton}"
+                        HorizontalAlignment="Right" Width="100"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>
