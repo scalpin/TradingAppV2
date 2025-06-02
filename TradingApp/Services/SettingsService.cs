@@ -34,6 +34,7 @@ namespace TradingApp.Services
             { "MTSS", "BBG004S681W1" },
             { "SIBN", "BBG004S684M6" },
             { "TATN", "BBG004RVFFC0" },
+            { "MAGN", "BBG004S68507" },
         };
         public string? GetFigiByTicker(string ticker)
         {
@@ -79,6 +80,7 @@ namespace TradingApp.Services
             ["MTSS"] = 10,
             ["SIBN"] = 1,
             ["TATN"] = 1,
+            ["MAGN"] = 10,
         };
         public int? GetLotSize(string ticker)
         {
@@ -110,6 +112,7 @@ namespace TradingApp.Services
             ["MTSS"] = 0.05,
             ["SIBN"] = 0.05,
             ["TATN"] = 0.1,
+            ["MAGN"] = 0.005,
         };
         public double GetTickSize(string ticker)
         {

@@ -154,6 +154,7 @@ namespace TradingApp
             BtnScreener.IsChecked = false;
 
             AutotradePanel.Visibility = System.Windows.Visibility.Visible;
+            SettingsPanel.Visibility = System.Windows.Visibility.Collapsed;
             ScreenerPanel.Visibility = System.Windows.Visibility.Collapsed;
         }
 
@@ -163,7 +164,15 @@ namespace TradingApp
             BtnScreener.IsChecked = true;
 
             AutotradePanel.Visibility = System.Windows.Visibility.Collapsed;
+            SettingsPanel.Visibility = System.Windows.Visibility.Collapsed;
             ScreenerPanel.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            AutotradePanel.Visibility = System.Windows.Visibility.Collapsed;
+            ScreenerPanel.Visibility = System.Windows.Visibility.Collapsed;
+            SettingsPanel.Visibility = System.Windows.Visibility.Visible;
         }
     }
 }

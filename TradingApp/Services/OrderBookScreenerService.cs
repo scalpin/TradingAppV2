@@ -61,6 +61,7 @@ public class OrderBookScreenerService
             { "BBG004S681W1", "MTSS" },
             { "BBG004S684M6", "SIBN" },
             { "BBG004RVFFC0", "TATN" },
+            { "BBG004S68507", "MAGN" },
         };
         _settings = settings;
     }
@@ -87,7 +88,7 @@ public class OrderBookScreenerService
                     //new OrderBookInstrument{Figi="BBG004730JJ5",Depth=20}, // MOEX
                     //new OrderBookInstrument{Figi="BBG004RVFCY3",Depth=20}, // MGNT
                     //new OrderBookInstrument{Figi="BBG004S68614",Depth=20}, // AFKS
-                    new OrderBookInstrument{Figi="BBG004S68B31",Depth=20}, // ALRS
+                    //new OrderBookInstrument{Figi="BBG004S68B31",Depth=20}, // ALRS
                     //new OrderBookInstrument{Figi="BBG00475K2X9",Depth=20}, // HYDR 
                     //new OrderBookInstrument{Figi="BBG000FR4JW2",Depth=20}, // SVCB (не работает) 
                     //new OrderBookInstrument{Figi="BBG004S681W1",Depth=20}, // MTSS
@@ -96,6 +97,7 @@ public class OrderBookScreenerService
                     //new OrderBookInstrument{Figi="BBG004731032",Depth=20}, // LKOH
                     //new OrderBookInstrument{Figi="BBG004S684M6",Depth=20}, // SIBN
                     //new OrderBookInstrument{Figi="BBG004RVFFC0",Depth=20}, // TATN
+                    new OrderBookInstrument{Figi="BBG004S68507",Depth=20}, // MAGN
                 }
             }
         });
@@ -125,7 +127,7 @@ public class OrderBookScreenerService
                     {
                         lastRestCall = DateTime.UtcNow;
 
-                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker)/7;
+                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker)*100;
                         var lotSize = _settings.GetLotSize(ticker);
                         
 

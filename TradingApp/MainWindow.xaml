@@ -5,26 +5,34 @@
         Loaded="Window_Loaded"
         Closed="Window_Closed">
     <DockPanel>
+        <!-- Верхняя панель с переключателем и кнопкой настроек -->
+        <Grid DockPanel.Dock="Top" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- Свитчер автоторговля/скринер -->
+            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center">
+                <ToggleButton x:Name="BtnAuto"
+                      Style="{StaticResource ModeToggleStyle}"
+                      IsChecked="True"
+                      Click="BtnAuto_Click">
+                    Автоторговля
+                </ToggleButton>
+                <ToggleButton x:Name="BtnScreener"
+                      Style="{StaticResource ModeToggleStyle}"
+                      Click="BtnScreener_Click">
+                    Скриннер
+                </ToggleButton>
+            </StackPanel>
+            <!-- Кнопка настроек (шестерёнка) -->
+            <Button x:Name="BtnSettings" Width="30" Height="30" Grid.Column="2" Click="BtnSettings_Click">
+                <Image Source="/Resources/static/settings_icon.png" />
+            </Button>
+        </Grid>
 
-        <!-- Переключатель режима -->
-        <StackPanel Orientation="Horizontal"
-              DockPanel.Dock="Top"
-              HorizontalAlignment="Left"
-              Margin="10">
-            <ToggleButton x:Name="BtnAuto"
-                  Style="{StaticResource ModeToggleStyle}"
-                  IsChecked="True"
-                  Click="BtnAuto_Click">
-                Автоторговля
-            </ToggleButton>
-            <ToggleButton x:Name="BtnScreener"
-                  Style="{StaticResource ModeToggleStyle}"
-                  Click="BtnScreener_Click">
-                Скриннер
-            </ToggleButton>
-        </StackPanel>
-
-        <!-- Здесь будем накладывать две панели друг на друга -->
+        <!-- Основная область с панелями -->
         <Grid Margin="10">
             <!-- Панель автоторговли -->
             <Grid x:Name="AutotradePanel" Visibility="Visible">
@@ -32,13 +40,12 @@
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <!-- Твой существующий контент автоторговли -->
                 <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,10,0">
-                    <TextBlock Text="Тикер" FontWeight="Bold" Margin="0,0,0,4"/>
+                    <TextBlock Text="Тикер" FontWeight="Bold" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                     <ComboBox x:Name="TickerComboBox"
-                    Width="150"
-                    IsEditable="True"
-                    SelectionChanged="TickerComboBox_SelectionChanged"/>
+                              Width="150"
+                              IsEditable="True"
+                              SelectionChanged="TickerComboBox_SelectionChanged"/>
                 </StackPanel>
                 <Grid Grid.Column="1">
                     <Grid.ColumnDefinitions>
@@ -66,13 +73,19 @@
 
             <!-- Панель скриннера -->
             <Grid x:Name="ScreenerPanel" Visibility="Collapsed">
-                <!-- Пока пусто -->
                 <TextBlock Text="Скриннер здесь будет" 
-                   HorizontalAlignment="Center" 
-                   VerticalAlignment="Center"
-                   FontSize="18"/>
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"
+                           FontSize="18"/>
+            </Grid>
+
+            <!-- Панель настроек -->
+            <Grid x:Name="SettingsPanel" Visibility="Collapsed">
+                <TextBlock Text="Настройки здесь будут" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"
+                           FontSize="18"/>
             </Grid>
         </Grid>
-
     </DockPanel>
 </Window>
