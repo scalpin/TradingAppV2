@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace TradingApp.ViewModels
 {
-    public class OrdersViewModel
+    public class AutoTradeViewModel
     {
 
     }

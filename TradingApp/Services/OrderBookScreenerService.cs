@@ -78,7 +78,7 @@ public class OrderBookScreenerService
                 SubscriptionAction = SubscriptionAction.Subscribe,
                 Instruments =
                 {
-                    //new OrderBookInstrument{Figi="BBG004S68598",Depth=20}, // MTLR
+                    new OrderBookInstrument{Figi="BBG004S68598",Depth=20}, // MTLR
                     //new OrderBookInstrument{Figi="BBG004S683W7",Depth=20}, // AFLT
                     //new OrderBookInstrument{Figi="BBG01JRXN2X9",Depth=20}, // ASTR (не работает)
                     //new OrderBookInstrument{Figi="BBG000NLB2G3",Depth=20}, // KROT
@@ -97,7 +97,7 @@ public class OrderBookScreenerService
                     //new OrderBookInstrument{Figi="BBG004731032",Depth=20}, // LKOH
                     //new OrderBookInstrument{Figi="BBG004S684M6",Depth=20}, // SIBN
                     //new OrderBookInstrument{Figi="BBG004RVFFC0",Depth=20}, // TATN
-                    new OrderBookInstrument{Figi="BBG004S68507",Depth=20}, // MAGN
+                    //new OrderBookInstrument{Figi="BBG004S68507",Depth=20}, // MAGN
                 }
             }
         });
@@ -127,7 +127,7 @@ public class OrderBookScreenerService
                     {
                         lastRestCall = DateTime.UtcNow;
 
-                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker)*100;
+                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker)/25;
                         var lotSize = _settings.GetLotSize(ticker);
                         
 

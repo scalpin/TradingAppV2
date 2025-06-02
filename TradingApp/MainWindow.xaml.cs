@@ -33,12 +33,14 @@ namespace TradingApp
         public MainWindow()
         {
             InitializeComponent();
-
+            
+            
             // инициализируем TradeService
             var settings = new SettingsService();
             _tradeService = new TradeService(settings);
             _settingsService = new SettingsService();
 
+            /*
             // заполнить ComboBox тикерами
             TickerComboBox.ItemsSource = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT" };
             TickerComboBox.SelectedIndex = 0; // сразу выберет SBER
@@ -52,6 +54,9 @@ namespace TradingApp
 
             // запустить стакан для первого выбранного
             StartOrderBookFor((string)TickerComboBox.SelectedItem!);
+            */
+
+            
         }
 
         public class OrderBookRow
@@ -60,12 +65,15 @@ namespace TradingApp
             public long Quantity { get; set; }
         }
 
+        /*
         private void TickerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TickerComboBox.SelectedItem is string ticker)
                 StartOrderBookFor(ticker);
         }
+        */
 
+        /*
         private async void StartOrderBookFor(string ticker)
         {
             // отменяем предыдущую подписку
@@ -109,23 +117,30 @@ namespace TradingApp
                 cancellationToken: _orderBookCts.Token
             );
         }
+        */
 
-
-
+        
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             var settings = new SettingsService();
 
+            /*
             // Запуск скриннера
             _screenerService = new OrderBookScreenerService(_tradeService.MarketDataStreamClient, settings, _tradeService);
             await _screenerService.StartAsync();
+            */
+            
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            /*
             // отменить подписку при закрытии
             _orderBookCts?.Cancel();
+            */
+            
         }
+        
 
         /*
         private void ModeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -147,15 +162,17 @@ namespace TradingApp
             }
         }
         */
+       
 
-        private void BtnAuto_Click(object sender, RoutedEventArgs e)
+        
+        public void BtnAuto_Click(object sender, RoutedEventArgs e)
         {
             BtnAuto.IsChecked = true;
             BtnScreener.IsChecked = false;
 
-            AutotradePanel.Visibility = System.Windows.Visibility.Visible;
-            SettingsPanel.Visibility = System.Windows.Visibility.Collapsed;
-            ScreenerPanel.Visibility = System.Windows.Visibility.Collapsed;
+            AutotradeView.Visibility = System.Windows.Visibility.Visible;
+            SettingsView.Visibility = System.Windows.Visibility.Collapsed;
+            ScreenerView.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void BtnScreener_Click(object sender, RoutedEventArgs e)
@@ -163,16 +180,17 @@ namespace TradingApp
             BtnAuto.IsChecked = false;
             BtnScreener.IsChecked = true;
 
-            AutotradePanel.Visibility = System.Windows.Visibility.Collapsed;
-            SettingsPanel.Visibility = System.Windows.Visibility.Collapsed;
-            ScreenerPanel.Visibility = System.Windows.Visibility.Visible;
+            AutotradeView.Visibility = System.Windows.Visibility.Collapsed;
+            SettingsView.Visibility = System.Windows.Visibility.Collapsed;
+            ScreenerView.Visibility = System.Windows.Visibility.Visible;
         }
 
-        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        private void SettingsIcon_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            AutotradePanel.Visibility = System.Windows.Visibility.Collapsed;
-            ScreenerPanel.Visibility = System.Windows.Visibility.Collapsed;
-            SettingsPanel.Visibility = System.Windows.Visibility.Visible;
+            AutotradeView.Visibility = System.Windows.Visibility.Collapsed;
+            ScreenerView.Visibility = System.Windows.Visibility.Collapsed;
+            SettingsView.Visibility = System.Windows.Visibility.Visible;
         }
+        
     }
 }

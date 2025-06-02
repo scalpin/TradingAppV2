@@ -1,6 +1,7 @@
 ﻿<Window x:Class="TradingApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TradingApp"
         Title="TradingApp" Height="600" Width="900"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
@@ -12,80 +13,29 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <!-- Свитчер автоторговля/скринер -->
             <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center">
                 <ToggleButton x:Name="BtnAuto"
-                      Style="{StaticResource ModeToggleStyle}"
-                      IsChecked="True"
-                      Click="BtnAuto_Click">
+                              Style="{StaticResource ModeToggleStyle}"
+                              IsChecked="True"
+                              Click="BtnAuto_Click">
                     Автоторговля
                 </ToggleButton>
                 <ToggleButton x:Name="BtnScreener"
-                      Style="{StaticResource ModeToggleStyle}"
-                      Click="BtnScreener_Click">
+                              Style="{StaticResource ModeToggleStyle}"
+                              Click="BtnScreener_Click">
                     Скриннер
                 </ToggleButton>
             </StackPanel>
-            <!-- Кнопка настроек (шестерёнка) -->
-            <Button x:Name="BtnSettings" Width="30" Height="30" Grid.Column="2" Click="BtnSettings_Click">
-                <Image Source="/Resources/static/settings_icon.png" />
-            </Button>
+            <Image Source="C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\Resources\static\settings_icon2.png" 
+                   Width="23" Height="23" Grid.Column="2" 
+                   MouseLeftButtonDown="SettingsIcon_MouseLeftButtonDown" Cursor="Hand" />
         </Grid>
 
-        <!-- Основная область с панелями -->
+        <!-- Основная область с UserControl -->
         <Grid Margin="10">
-            <!-- Панель автоторговли -->
-            <Grid x:Name="AutotradePanel" Visibility="Visible">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,10,0">
-                    <TextBlock Text="Тикер" FontWeight="Bold" Margin="0,0,0,4" HorizontalAlignment="Center"/>
-                    <ComboBox x:Name="TickerComboBox"
-                              Width="150"
-                              IsEditable="True"
-                              SelectionChanged="TickerComboBox_SelectionChanged"/>
-                </StackPanel>
-                <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Header="Bids" Grid.Column="0" Margin="0,0,5,0">
-                        <DataGrid x:Name="BidsGrid" AutoGenerateColumns="False" IsReadOnly="True">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="*"/>
-                                <DataGridTextColumn Header="Объём" Binding="{Binding Quantity}" Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </GroupBox>
-                    <GroupBox Header="Asks" Grid.Column="1" Margin="5,0,0,0">
-                        <DataGrid x:Name="AsksGrid" AutoGenerateColumns="False" IsReadOnly="True">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="*"/>
-                                <DataGridTextColumn Header="Объём" Binding="{Binding Quantity}" Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </GroupBox>
-                </Grid>
-            </Grid>
-
-            <!-- Панель скриннера -->
-            <Grid x:Name="ScreenerPanel" Visibility="Collapsed">
-                <TextBlock Text="Скриннер здесь будет" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Center"
-                           FontSize="18"/>
-            </Grid>
-
-            <!-- Панель настроек -->
-            <Grid x:Name="SettingsPanel" Visibility="Collapsed">
-                <TextBlock Text="Настройки здесь будут" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Center"
-                           FontSize="18"/>
-            </Grid>
+            <local:AutotradeView x:Name="AutotradeView" Visibility="Visible"/>
+            <local:ScreenerView x:Name="ScreenerView" Visibility="Collapsed"/>
+            <local:SettingsView x:Name="SettingsView" Visibility="Collapsed"/>
         </Grid>
     </DockPanel>
 </Window>

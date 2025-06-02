@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TradingApp.ViewModels
 {
-    class PortfolioViewModel
+    class ScreenerViewModel
     {
     }
 }
