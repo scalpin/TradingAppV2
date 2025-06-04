@@ -113,16 +113,14 @@
                     <RepeatButton Command="ScrollBar.PageUpCommand"
                                   Style="{x:Null}"
                                   Background="Transparent"
-                                  IsTabStop="False"
-                                  IsEnabled="False"/>
+                                  IsTabStop="False"/>
                 </Track.DecreaseRepeatButton>
 
                 <Track.Thumb>
                     <Thumb SnapsToDevicePixels="True">
                         <Thumb.Template>
                             <ControlTemplate TargetType="Thumb">
-                                <Border Background="{StaticResource PrimaryColor}"
-                                        CornerRadius="3"/>
+                                <Border Background="{StaticResource PrimaryColor}"/>
                             </ControlTemplate>
                         </Thumb.Template>
                     </Thumb>
@@ -132,8 +130,7 @@
                     <RepeatButton Command="ScrollBar.PageDownCommand"
                                   Style="{x:Null}"
                                   Background="Transparent"
-                                  IsTabStop="False"
-                                  IsEnabled="False"/>
+                                  IsTabStop="False"/>
                 </Track.IncreaseRepeatButton>
             </Track>
         </Grid>
@@ -146,16 +143,14 @@
                     <RepeatButton Command="ScrollBar.PageLeftCommand"
                                   Style="{x:Null}"
                                   Background="Transparent"
-                                  IsTabStop="False"
-                                  IsEnabled="False"/>
+                                  IsTabStop="False"/>
                 </Track.DecreaseRepeatButton>
 
                 <Track.Thumb>
                     <Thumb SnapsToDevicePixels="True">
                         <Thumb.Template>
                             <ControlTemplate TargetType="Thumb">
-                                <Border Background="{StaticResource PrimaryColor}"
-                                        CornerRadius="3"/>
+                                <Border Background="{StaticResource PrimaryColor}"/>
                             </ControlTemplate>
                         </Thumb.Template>
                     </Thumb>
@@ -171,10 +166,10 @@
             </Track>
         </Grid>
     </ControlTemplate>
+    
 
     <Style TargetType="ScrollBar">
-        <Setter Property="Width" Value="6"/>
-        <Setter Property="Height" Value="6"/>
+        <Setter Property="Width" Value="2"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template" Value="{StaticResource VerticalScrollBarTemplate}"/>
 
@@ -216,13 +211,20 @@
         </Style.Triggers>
     </Style>
 
+    <!-- table headers -->
+    <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="#404040"/>
+        <Setter Property="Foreground" Value="{StaticResource AppForeground}"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
     
     <!-- DataGrid -->
     <Style x:Key="OrderBookDataGridStyle" TargetType="DataGrid">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="{StaticResource TextboxBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="RowHeight" Value="30"/>
+        <Setter Property="RowHeight" Value="25"/>
         <Setter Property="CanUserAddRows" Value="False"/>
         <Setter Property="HeadersVisibility" Value="Column"/>
         <Setter Property="HorizontalGridLinesBrush" Value="#2a2a2a"/>
@@ -233,11 +235,14 @@
         <Setter Property="Padding" Value="0"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+
+        <Setter Property="CanUserSortColumns" Value="False"/>
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource ColumnHeaderStyle}"/>
     </Style>
 
     <!-- bids -->
     <Style x:Key="BidsPriceTextStyle" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="#88FF88"/>
+        <Setter Property="Foreground" Value="#22DD22"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Padding" Value="4,0,4,0"/>
@@ -258,5 +263,86 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Padding" Value="4,0,4,0"/>
     </Style>
+
+    <Style x:Key="SettingsComboBox" TargetType="ComboBox">
+        <Setter Property="Background" Value="{StaticResource PanelBackground}" />
+        <Setter Property="Foreground" Value="{StaticResource AppForeground}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TextboxBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="4,2" />
+        <Setter Property="Margin" Value="0,0,0,10" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton 
+                            Name="ToggleButton"
+                            Grid.Column="2"
+                            Focusable="False"
+                            IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <Grid>
+                                                        <Path
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Margin="750,0,8,0"
+                                    Data="M 0 0 L 4 4 L 8 0 Z"
+                                    Fill="{TemplateBinding Foreground}" />
+                                                    </Grid>
+                        </ToggleButton>
+                        <ContentPresenter
+                        Name="ContentSite"
+                        IsHitTestVisible="False"
+                        Content="{TemplateBinding SelectionBoxItem}"
+                        ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                        ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                        Margin="6,2,25,2"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left" />
+                        <Popup
+                        Name="Popup"
+                        Placement="Bottom"
+                        IsOpen="{TemplateBinding IsDropDownOpen}"
+                        AllowsTransparency="True"
+                        Focusable="False"
+                        PopupAnimation="Slide">
+                            <Grid
+                            Name="DropDown"
+                            SnapsToDevicePixels="True"
+                            MinWidth="{TemplateBinding ActualWidth}"
+                            MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                            Background="{StaticResource PanelBackground}">
+                                <Border
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" />
+                                <ScrollViewer Margin="4,6,4,6"
+                                          SnapsToDevicePixels="True">
+                                    <StackPanel IsItemsHost="True"
+                                            KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Grid>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter TargetName="DropDown" Property="MinHeight" Value="95" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="Gray" />
+                        </Trigger>
+                        <Trigger Property="IsGrouping" Value="True">
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
 
 </ResourceDictionary>

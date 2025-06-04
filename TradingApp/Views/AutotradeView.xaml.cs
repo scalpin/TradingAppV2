@@ -31,7 +31,8 @@ namespace TradingApp
         private readonly ObservableCollection<OrderBookRow> _bids = new();
         private readonly ObservableCollection<OrderBookRow> _asks = new();
 
-        private readonly string[] _tickers = { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT" };
+        private readonly string[] _tickers = { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT", "X5", "BELU", "RUAL",
+                                               "MOEX", "MGNT", "AFKS",  "ALRS", "HYDR",  "SVCB", "MTSS", "SIBN", "TATN", "MAGN"};
 
         public AutotradeView()
         {

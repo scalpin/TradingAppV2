@@ -136,11 +136,8 @@ namespace TradingApp
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            /*
             // отменить подписку при закрытии
             _orderBookCts?.Cancel();
-            */
-            
         }
         
 

@@ -5,7 +5,6 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- путь относительный к проекту -->
                 <ResourceDictionary Source="C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\Resources\Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

@@ -7,14 +7,40 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,10,0">
-            <TextBlock Text="Тикер" FontWeight="Bold" Margin="0,0,0,4" HorizontalAlignment="Center"/>
+        <Grid Grid.Column="0" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="120"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Тикер"
+                       FontWeight="Bold"
+                       Margin="0,0,0,4"
+                       HorizontalAlignment="Center"
+                       Grid.Row="0"/>
 
             <ListBox x:Name="TickerListBox"
+                     Grid.Row="1"
                      Style="{StaticResource TickerListBoxStyle}"
                      ItemContainerStyle="{StaticResource TickerListBoxItemStyle}"
                      SelectionMode="Single"/>
-        </StackPanel>
+
+            <TextBlock Text="Журнал"
+                       FontWeight="Bold"
+                       Margin="0,0,0,4"
+                       HorizontalAlignment="Center"
+                       Grid.Row="3"
+                       VerticalAlignment="Top"/>
+
+            <ListBox x:Name="LogsListBox"
+                     Grid.Row="3"
+                     Margin="0,5,0,0"
+                     Height="385"
+                     Style="{StaticResource TickerListBoxStyle}">
+            </ListBox>
+        </Grid>
 
         <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
@@ -29,18 +55,16 @@
                       Background="Transparent"
                       Foreground="{StaticResource AppForeground}"
                       BorderBrush="{StaticResource TextboxBorder}"
-                      BorderThickness="1"
-                      Padding="8">
+                      BorderThickness="0"
+                      Padding="8,3,4,8">
                 <DataGrid x:Name="BidsGrid"
                           Style="{StaticResource OrderBookDataGridStyle}"
                           AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <!-- Цены (зеленый) -->
                         <DataGridTextColumn Header="Price"
                                             Binding="{Binding Price}"
                                             Width="*"
                                             ElementStyle="{StaticResource BidsPriceTextStyle}"/>
-                        <!-- Объём (светлый) -->
                         <DataGridTextColumn Header="Volume"
                                             Binding="{Binding Quantity}"
                                             Width="*"
@@ -56,18 +80,16 @@
                       Background="Transparent"
                       Foreground="{StaticResource AppForeground}"
                       BorderBrush="{StaticResource TextboxBorder}"
-                      BorderThickness="1"
-                      Padding="8">
+                      BorderThickness="0"
+                      Padding="4,3,8,8">
                 <DataGrid x:Name="AsksGrid"
                           Style="{StaticResource OrderBookDataGridStyle}"
                           AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <!-- Цены (красный) -->
                         <DataGridTextColumn Header="Price"
                                             Binding="{Binding Price}"
                                             Width="*"
                                             ElementStyle="{StaticResource AsksPriceTextStyle}"/>
-                        <!-- Объём (светлый) -->
                         <DataGridTextColumn Header="Volume"
                                             Binding="{Binding Quantity}"
                                             Width="*"
@@ -75,7 +97,6 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
-
         </Grid>
     </Grid>
 </UserControl>

@@ -30,6 +30,32 @@
                 </StackPanel>
             </Border>
 
+            <Border Style="{StaticResource SettingsBlock}">
+                <StackPanel>
+                    <TextBlock Text="Параметры торговли" Style="{StaticResource SettingsBlockTitle}" />
+
+                    <ComboBox ItemsSource="{Binding Instruments}"
+                          SelectedItem="{Binding SelectedInstrument, UpdateSourceTrigger=PropertyChanged}"
+                          Style="{StaticResource SettingsComboBox}" />
+
+                    <TextBlock Text="Чувствительность поиска (от 0 до 100)" Style="{StaticResource LabelText}" />
+                    <TextBox 
+                         Style="{StaticResource SettingsTextBox}" />
+
+                    <TextBlock Text="Уровень фиксации прибыли" Style="{StaticResource LabelText}" />
+                    <TextBox
+                         Style="{StaticResource SettingsTextBox}" />
+
+                    <TextBlock Text="Нижний предел доли кластера" Style="{StaticResource LabelText}" />
+                    <TextBox
+                         Style="{StaticResource SettingsTextBox}" />
+
+                    <Button Content="Сохранить" Click="SaveSettings_Click"
+                        Style="{StaticResource PrimaryButton}"
+                        HorizontalAlignment="Right" Width="100"/>
+                </StackPanel>
+            </Border>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>
