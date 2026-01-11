@@ -38,13 +38,6 @@ namespace TradingApp.Services
             File.WriteAllText(FilePath, json);
         }
 
-
-
-
-        //public string fToken { get; set; } = "CAEQ36PDCBoYphIlMaaXcYzx2Wpl2nvUx+/juue4k0AR";
-        //public string tToken { get; set; } = "t.fvdclBoZKw_MlDraPaWfM7gVlzhybv4-_hSItZLyQEIDuXW7r8jNBlWBbAi4kwDQpLlyl6PX3EMhZ5edlpKx5A";
-        //public string ClientId { get; set; } = "707190RBMU2";
-
         // Словарь «тикер → FIGI»
         private readonly Dictionary<string, string> _tickerToFigi = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -68,6 +61,8 @@ namespace TradingApp.Services
             { "SIBN", "BBG004S684M6" },
             { "TATN", "BBG004RVFFC0" },
             { "MAGN", "BBG004S68507" },
+            { "TRMK", "BBG004TC84Z8" },
+            { "RTKM", "BBG004S682Z6" },
         };
         public string? GetFigiByTicker(string ticker)
         {
@@ -114,6 +109,8 @@ namespace TradingApp.Services
             ["SIBN"] = 1,
             ["TATN"] = 1,
             ["MAGN"] = 10,
+            ["TRMK"] = 10,
+            ["RTKM"] = 10,
         };
         public int? GetLotSize(string ticker)
         {
@@ -135,7 +132,7 @@ namespace TradingApp.Services
             ["X5"]   = 0.5,
             ["BELU"] = 0.5,
             ["KROT"] = 1.0,
-            ["RUAL"] = 0.05,
+            ["RUAL"] = 0.005,
             ["MOEX"] = 0.01,
             ["MGNT"] = 0.5,
             ["AFKS"] = 0.001,
@@ -146,6 +143,8 @@ namespace TradingApp.Services
             ["SIBN"] = 0.05,
             ["TATN"] = 0.1,
             ["MAGN"] = 0.005,
+            ["TRMK"] = 0.02,
+            ["RTKM"] = 0.01,
         };
         public double GetTickSize(string ticker)
         {

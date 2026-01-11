@@ -62,6 +62,8 @@ public class OrderBookScreenerService
             { "BBG004S684M6", "SIBN" },
             { "BBG004RVFFC0", "TATN" },
             { "BBG004S68507", "MAGN" },
+            { "BBG004TC84Z8", "TRMK" },
+            { "BBG004S682Z6", "RTKM" },
         };
         _settings = settings;
     }
@@ -78,7 +80,7 @@ public class OrderBookScreenerService
                 SubscriptionAction = SubscriptionAction.Subscribe,
                 Instruments =
                 {
-                    new OrderBookInstrument{Figi="BBG004S68598",Depth=20}, // MTLR
+                    //new OrderBookInstrument{Figi="BBG004S68598",Depth=20}, // MTLR
                     //new OrderBookInstrument{Figi="BBG004S683W7",Depth=20}, // AFLT
                     //new OrderBookInstrument{Figi="BBG01JRXN2X9",Depth=20}, // ASTR (не работает)
                     //new OrderBookInstrument{Figi="BBG000NLB2G3",Depth=20}, // KROT
@@ -87,7 +89,7 @@ public class OrderBookScreenerService
                     //new OrderBookInstrument{Figi="BBG008F2T3T2",Depth=20}, // RUAL
                     //new OrderBookInstrument{Figi="BBG004730JJ5",Depth=20}, // MOEX
                     //new OrderBookInstrument{Figi="BBG004RVFCY3",Depth=20}, // MGNT
-                    //new OrderBookInstrument{Figi="BBG004S68614",Depth=20}, // AFKS
+                    new OrderBookInstrument{Figi="BBG004S68614",Depth=20}, // AFKS
                     //new OrderBookInstrument{Figi="BBG004S68B31",Depth=20}, // ALRS
                     //new OrderBookInstrument{Figi="BBG00475K2X9",Depth=20}, // HYDR 
                     //new OrderBookInstrument{Figi="BBG000FR4JW2",Depth=20}, // SVCB (не работает) 
@@ -98,6 +100,8 @@ public class OrderBookScreenerService
                     //new OrderBookInstrument{Figi="BBG004S684M6",Depth=20}, // SIBN
                     //new OrderBookInstrument{Figi="BBG004RVFFC0",Depth=20}, // TATN
                     //new OrderBookInstrument{Figi="BBG004S68507",Depth=20}, // MAGN
+                    //new OrderBookInstrument{Figi="BBG004TC84Z8",Depth=20}, // TRMK
+                    //new OrderBookInstrument{Figi="BBG004S682Z6",Depth=20}, // RTKM
                 }
             }
         });
@@ -127,7 +131,7 @@ public class OrderBookScreenerService
                     {
                         lastRestCall = DateTime.UtcNow;
 
-                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker)/25;
+                        double avgVolume = await GetAverageVolumePer10MinAsync(ticker)/8;
                         var lotSize = _settings.GetLotSize(ticker);
                         
 
@@ -202,7 +206,7 @@ public class OrderBookScreenerService
 
                                 // лимитка продать на ценовом уровне выше кластера (- шаг)
                                 var buyPrice = priceDouble - _settings.GetTickSize(ticker); 
-                                var buyLots = 1; // или сколько надо лотов
+                                var buyLots = 10; // или сколько надо лотов
                                 var TransactionId = await _tradeService.PlaceLimitOrderAsync( // ставит заявку и возвращает TransactionId
                                       securityCode: ticker,
                                       price: buyPrice,

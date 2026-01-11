@@ -58,7 +58,7 @@ namespace TradingApp
             StartOrderBookFor((string)TickerComboBox.SelectedItem!);
             */
 
-            
+            //
         }
 
         public class OrderBookRow
@@ -126,11 +126,11 @@ namespace TradingApp
         {
             var settings = new SettingsService();
 
-            /*
+            
             // Запуск скриннера
             _screenerService = new OrderBookScreenerService(_tradeService.MarketDataStreamClient, settings, _tradeService);
             await _screenerService.StartAsync();
-            */
+            
             
         }
 
