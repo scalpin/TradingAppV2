@@ -102,3 +102,4 @@ C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backup
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.pdb
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.genruntimeconfig.cache
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\ref\FinamV2Spike.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.sourcelink.json

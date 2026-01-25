@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FinamV2Spike")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a15bfef693374fc86366b828a1e7ce15b2a06dad")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+30632f2fbf6aeb5ab09e706a988afbc6aaa83ada")]
 [assembly: System.Reflection.AssemblyProductAttribute("FinamV2Spike")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FinamV2Spike")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

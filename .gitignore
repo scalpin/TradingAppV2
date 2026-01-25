@@ -1,1 +1,9 @@
 .vs/
+.env
+.env.*
+
+secret.txt
+token.txt
+
+*.cer
+*.crt
