@@ -813,11 +813,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\TradingApp\\TradingApp\\TradingApp.csproj",
+      "projectUniqueName": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\backupTAPP\\TradingApp\\TradingApp.csproj",
       "projectName": "TradingApp",
-      "projectPath": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\TradingApp\\TradingApp\\TradingApp.csproj",
+      "projectPath": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\backupTAPP\\TradingApp\\TradingApp.csproj",
       "packagesPath": "C:\\Users\\abros\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\TradingApp\\TradingApp\\obj\\",
+      "outputPath": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\backupTAPP\\TradingApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

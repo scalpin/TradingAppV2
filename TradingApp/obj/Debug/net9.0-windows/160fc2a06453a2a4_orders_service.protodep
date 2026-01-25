@@ -1,0 +1,12 @@
+obj\Debug\net9.0-windows\grpc\tradeapi\v1\orders/OrdersService.cs \
+obj\Debug\net9.0-windows\grpc\tradeapi\v1\orders/OrdersServiceGrpc.cs: proto/google/api/http.proto\
+ C:/Users/abros/.nuget/packages/grpc.tools/2.71.0/build/native/include/google/protobuf/descriptor.proto\
+ proto/google/api/annotations.proto\
+ C:/Users/abros/.nuget/packages/grpc.tools/2.71.0/build/native/include/google/protobuf/timestamp.proto\
+ proto/google/type/decimal.proto\
+ proto/grpc/tradeapi/v1/side.proto\
+ proto/grpc/tradeapi/v1/trade.proto\
+ C:/Users/abros/.nuget/packages/grpc.tools/2.71.0/build/native/include/google/protobuf/struct.proto\
+ proto/protoc-gen-openapiv2/options/openapiv2.proto\
+ proto/protoc-gen-openapiv2/options/annotations.proto\
+ proto/grpc/tradeapi/v1/orders/orders_service.proto

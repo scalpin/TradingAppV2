@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.30.2" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.70.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.71.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Берём ВСЕ proto, чтобы не ловить missing imports -->
+		<Protobuf Include="..\proto\**\*.proto"
+				  ProtoRoot="..\proto"
+				  GrpcServices="None" />
+
+		<!-- А вот эти генерят клиентов -->
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\auth\auth_service.proto"
+				  GrpcServices="Client" />
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\orders\orders_service.proto"
+				  GrpcServices="Client" />
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\marketdata\marketdata_service.proto"
+				  GrpcServices="Client" />
+	</ItemGroup>
+
+	
+</Project>
+

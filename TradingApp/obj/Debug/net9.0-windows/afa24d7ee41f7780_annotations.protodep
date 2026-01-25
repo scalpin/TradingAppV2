@@ -1,0 +1,4 @@
+obj\Debug\net9.0-windows\protoc-gen-openapiv2\options/Annotations.cs: C:/Users/abros/.nuget/packages/grpc.tools/2.71.0/build/native/include/google/protobuf/descriptor.proto\
+ C:/Users/abros/.nuget/packages/grpc.tools/2.71.0/build/native/include/google/protobuf/struct.proto\
+ proto/protoc-gen-openapiv2/options/openapiv2.proto\
+ proto/protoc-gen-openapiv2/options/annotations.proto

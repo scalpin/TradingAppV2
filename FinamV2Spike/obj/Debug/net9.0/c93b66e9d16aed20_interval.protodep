@@ -1,0 +1,2 @@
+obj\Debug\net9.0\google\type/Interval.cs: C:/Users/abros/.nuget/packages/grpc.tools/2.71.0/build/native/include/google/protobuf/timestamp.proto\
+ ../proto/google/type/interval.proto

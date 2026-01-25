@@ -4,15 +4,15 @@
 winexe
 C#
 .cs
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\obj\Debug\net9.0-windows\
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\
 TradingApp
 none
 false
 TRACE;DEBUG;NET;NET9_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\TradingApp\TradingApp\App.xaml
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\App.xaml
 4-1727745836
 1-1493912956
-261047740049
+35440903685
 214-2123164831
 MainWindow.xaml;Views\AutotradeView.xaml;Views\ScreenerView.xaml;Views\SettingsView.xaml;
 
