@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.33.4" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.76.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.76.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.30.2" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.70.0" />
+		<PackageReference Include="Grpc.Core.Api" Version="2.71.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.71.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Финальные сервисы: генерим клиентов -->
+		<Protobuf Include="..\proto\grpc\tradeapi\v1\auth\auth_service.proto" GrpcServices="Client" ProtoRoot="..\proto" />
+
+		<Protobuf Include="..\proto\grpc\tradeapi\v1\orders\orders_service.proto" GrpcServices="Client" ProtoRoot="..\proto" />
+
+		<Protobuf Include="..\proto\grpc\tradeapi\v1\marketdata\marketdata_service.proto" GrpcServices="Client" ProtoRoot="..\proto" />
+
+		<!-- Зависимости: компилировать НЕ нужно как сервисы, но файлы должны быть видны для import -->
+		<Protobuf Include="..\proto\google\**\*.proto" GrpcServices="None" ProtoRoot="..\proto" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Trading.Core\Trading.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- 1) Включаем ВСЕ proto tradeapi как зависимости -->
+		<Protobuf Include="..\proto\grpc\**\*.proto" GrpcServices="None" ProtoRoot="..\proto" />
+
+		<!-- 2) А теперь говорим: вот эти три — генерировать как gRPC клиентов -->
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\auth\auth_service.proto" GrpcServices="Client" />
+
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\orders\orders_service.proto" GrpcServices="Client" />
+
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\marketdata\marketdata_service.proto" GrpcServices="Client" />
+
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\trade.proto" GrpcServices="Client" />
+
+		<Protobuf Update="..\proto\grpc\tradeapi\v1\side.proto" GrpcServices="Client" />
+
+		<!-- 3) Гугловые зависимости тоже подхватываем -->
+		<Protobuf Include="..\proto\google\api\**\*.proto" GrpcServices="None" ProtoRoot="..\proto" />
+
+		<Protobuf Include="..\proto\google\type\**\*.proto" GrpcServices="None" ProtoRoot="..\proto" />
+	</ItemGroup>
+
+</Project>

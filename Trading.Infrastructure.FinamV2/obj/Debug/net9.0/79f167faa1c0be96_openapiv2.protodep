@@ -1,0 +1,2 @@
+obj\Debug\net9.0\grpc\gateway\protoc_gen_openapiv2\options/Openapiv2.cs: C:/Users/abros/.nuget/packages/grpc.tools/2.76.0/build/native/include/google/protobuf/struct.proto\
+ ../proto/grpc/gateway/protoc_gen_openapiv2/options/openapiv2.proto

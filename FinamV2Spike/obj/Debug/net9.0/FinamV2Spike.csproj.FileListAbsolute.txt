@@ -1,3 +1,12 @@
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.csproj.AssemblyReference.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.AssemblyInfoInputs.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.AssemblyInfo.cs
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.csproj.CoreCompileInputs.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.RazorAssemblyInfo.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.RazorAssemblyInfo.cs
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.sourcelink.json
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\appsettings.json
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\FinamV2Spike.staticwebassets.runtime.json
@@ -11,14 +20,10 @@ C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backup
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\Grpc.Core.Api.dll
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\Grpc.Net.Client.dll
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\Grpc.Net.Common.dll
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.csproj.AssemblyReference.cache
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.AssemblyInfoInputs.cache
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.AssemblyInfo.cs
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.csproj.CoreCompileInputs.cache
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.RazorAssemblyInfo.cache
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.RazorAssemblyInfo.cs
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\Trading.Core.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\Trading.Infrastructure.FinamV2.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\Trading.Infrastructure.FinamV2.pdb
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\bin\Debug\net9.0\Trading.Core.pdb
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\scopedcss\Pages\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\scopedcss\bundle\FinamV2Spike.styles.css
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\scopedcss\projectbundle\FinamV2Spike.bundle.scp.css
@@ -102,4 +107,3 @@ C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backup
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.pdb
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.genruntimeconfig.cache
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\ref\FinamV2Spike.dll
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\FinamV2Spike\obj\Debug\net9.0\FinamV2Spike.sourcelink.json

@@ -1,0 +1,12 @@
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\Trading.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\Trading.Core.AssemblyInfoInputs.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\Trading.Core.AssemblyInfo.cs
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\Trading.Core.csproj.CoreCompileInputs.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\Trading.Core.sourcelink.json
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\bin\Debug\net9.0\Trading.Core.deps.json
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\bin\Debug\net9.0\Trading.Core.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\bin\Debug\net9.0\Trading.Core.pdb
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\Trading.Core.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\refint\Trading.Core.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\Trading.Core.pdb
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Core\obj\Debug\net9.0\ref\Trading.Core.dll

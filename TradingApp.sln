@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingApp", "TradingApp\TradingApp.csproj", "{4ED9B58B-7480-433E-8594-2CF903F6BF76}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinamV2Spike", "FinamV2Spike\FinamV2Spike.csproj", "{4719D845-71C6-4CE9-9025-8B373D95F210}"
+	ProjectSection(ProjectDependencies) = postProject
+		{028FEE82-FC58-4A60-88AE-386AE4C79EF1} = {028FEE82-FC58-4A60-88AE-386AE4C79EF1}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proto", "proto", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
 EndProject
@@ -56,6 +59,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "options", "options", "{67BA
 		TradingApp\proto\protoc-gen-openapiv2\options\openapiv2.proto = TradingApp\proto\protoc-gen-openapiv2\options\openapiv2.proto
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trading.Core", "Trading.Core\Trading.Core.csproj", "{E0B35BFA-7155-4129-8BDA-6E72A4917104}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trading.Infrastructure.FinamV2", "Trading.Infrastructure.FinamV2\Trading.Infrastructure.FinamV2.csproj", "{028FEE82-FC58-4A60-88AE-386AE4C79EF1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E0B35BFA-7155-4129-8BDA-6E72A4917104} = {E0B35BFA-7155-4129-8BDA-6E72A4917104}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +80,14 @@ Global
 		{4719D845-71C6-4CE9-9025-8B373D95F210}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4719D845-71C6-4CE9-9025-8B373D95F210}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4719D845-71C6-4CE9-9025-8B373D95F210}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0B35BFA-7155-4129-8BDA-6E72A4917104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0B35BFA-7155-4129-8BDA-6E72A4917104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0B35BFA-7155-4129-8BDA-6E72A4917104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0B35BFA-7155-4129-8BDA-6E72A4917104}.Release|Any CPU.Build.0 = Release|Any CPU
+		{028FEE82-FC58-4A60-88AE-386AE4C79EF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{028FEE82-FC58-4A60-88AE-386AE4C79EF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{028FEE82-FC58-4A60-88AE-386AE4C79EF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{028FEE82-FC58-4A60-88AE-386AE4C79EF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

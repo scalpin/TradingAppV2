@@ -8,19 +8,16 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" Version="3.30.2" />
-		<PackageReference Include="Grpc.Net.Client" Version="2.70.0" />
+		<PackageReference Include="Google.Protobuf" Version="3.33.4" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
 		<PackageReference Include="Grpc.Tools" Version="2.71.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+	
 
 	<ItemGroup>
-		<!-- Берём ВСЕ proto, чтобы не ловить missing imports -->
-		<Protobuf Include="..\proto\**\*.proto"
-				  ProtoRoot="..\proto"
-				  GrpcServices="None" />
 
 		<!-- А вот эти генерят клиентов -->
 		<Protobuf Update="..\proto\grpc\tradeapi\v1\auth\auth_service.proto"
@@ -31,6 +28,9 @@
 				  GrpcServices="Client" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\Trading.Infrastructure.FinamV2\Trading.Infrastructure.FinamV2.csproj" />
+	</ItemGroup>
 	
 </Project>
 

@@ -1,0 +1,4 @@
+obj\Debug\net9.0\grpc\tradeapi\v1/Trade.cs: C:/Users/abros/.nuget/packages/grpc.tools/2.76.0/build/native/include/google/protobuf/timestamp.proto\
+ ../proto/google/type/decimal.proto\
+ ../proto/grpc/tradeapi/v1/side.proto\
+ ../proto/grpc/tradeapi/v1/trade.proto

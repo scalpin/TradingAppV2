@@ -1,0 +1,16 @@
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.csproj.AssemblyReference.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.AssemblyInfoInputs.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.AssemblyInfo.cs
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.csproj.CoreCompileInputs.cache
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.sourcelink.json
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\bin\Debug\net9.0\Trading.Infrastructure.FinamV2.deps.json
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\bin\Debug\net9.0\Trading.Infrastructure.FinamV2.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\bin\Debug\net9.0\Trading.Infrastructure.FinamV2.pdb
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\bin\Debug\net9.0\Trading.Core.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\bin\Debug\net9.0\Trading.Core.pdb
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading..03184A88.Up2Date
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\refint\Trading.Infrastructure.FinamV2.dll
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\Trading.Infrastructure.FinamV2.pdb
+C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\Trading.Infrastructure.FinamV2\obj\Debug\net9.0\ref\Trading.Infrastructure.FinamV2.dll
