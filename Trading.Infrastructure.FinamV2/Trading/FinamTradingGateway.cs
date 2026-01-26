@@ -11,13 +11,6 @@ using Trading.Core.Models;
 using Trading.Infrastructure.FinamV2.FinamGrpc;
 using Grpc.Tradeapi.V1.Orders;
 
-using CoreSide = Trading.Core.Models.Side;
-using FinamOrderType = Grpc.Tradeapi.V1.Orders.OrderType;
-using FinamTif = Grpc.Tradeapi.V1.Orders.TimeInForce;
-
-using ActionEnum = Grpc.Tradeapi.V1.Orders.OrderTradeRequest.Types.Action;
-using DataTypeEnum = Grpc.Tradeapi.V1.Orders.OrderTradeRequest.Types.DataType;
-
 
 namespace Trading.Infrastructure.FinamV2.Trading;
 

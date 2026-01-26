@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingApp", "TradingApp\TradingApp.csproj", "{4ED9B58B-7480-433E-8594-2CF903F6BF76}"
+	ProjectSection(ProjectDependencies) = postProject
+		{028FEE82-FC58-4A60-88AE-386AE4C79EF1} = {028FEE82-FC58-4A60-88AE-386AE4C79EF1}
+		{E0B35BFA-7155-4129-8BDA-6E72A4917104} = {E0B35BFA-7155-4129-8BDA-6E72A4917104}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinamV2Spike", "FinamV2Spike\FinamV2Spike.csproj", "{4719D845-71C6-4CE9-9025-8B373D95F210}"
 	ProjectSection(ProjectDependencies) = postProject

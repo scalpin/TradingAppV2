@@ -1,9 +1,9 @@
 ﻿//OrderBookCache.cs
 using System.Collections.Generic;
-using System.Globalization;
+using System.Threading;
 using Grpc.Tradeapi.V1.Marketdata;
+using Trading.Core.Models;
 using Trading.Infrastructure.FinamV2.FinamGrpc;
-
 
 namespace Trading.Infrastructure.FinamV2.MarketData;
 
@@ -14,6 +14,8 @@ public sealed class OrderBookCache
     private readonly SortedDictionary<decimal, decimal> _bids =
         new(Comparer<decimal>.Create((a, b) => b.CompareTo(a)));
     private readonly SortedDictionary<decimal, decimal> _asks = new();
+
+    private int _dirty; // 0/1
 
     public void ApplyRow(StreamOrderBook.Types.Row row)
     {
@@ -37,59 +39,72 @@ public sealed class OrderBookCache
 
         if (size is null) return;
 
+        var a = row.Action.ToString().ToUpperInvariant();
+        var isRemove = a.Contains("REMOVE") || a.Contains("DELETE");
+
+        var changed = false;
+
         lock (_gate)
         {
             var book = isBid ? _bids : _asks;
 
-            // не гадаем про enum имена, работаем через ToString()
-            var a = row.Action.ToString().ToUpperInvariant();
-            var isRemove = a.Contains("REMOVE") || a.Contains("DELETE");
-
             if (isRemove)
             {
-                book.Remove(price.Value);
-                return;
+                changed = book.Remove(price.Value);
             }
+            else
+            {
+                if (size.Value <= 0)
+                {
+                    changed = book.Remove(price.Value);
+                }
+                else
+                {
+                    if (book.TryGetValue(price.Value, out var old))
+                        changed = old != size.Value;
+                    else
+                        changed = true;
 
-            if (size.Value <= 0) book.Remove(price.Value);
-            else book[price.Value] = size.Value;
+                    book[price.Value] = size.Value;
+                }
+            }
         }
+
+        if (changed)
+            Volatile.Write(ref _dirty, 1);
     }
 
-    public (decimal? bid, decimal? ask) Best()
+    public bool TryBuildSnapshot(int depth, out Level[] bids, out Level[] asks)
     {
+        bids = System.Array.Empty<Level>();
+        asks = System.Array.Empty<Level>();
+
+        if (Interlocked.Exchange(ref _dirty, 0) == 0)
+            return false;
+
         lock (_gate)
         {
-            decimal? bid = null;
-            decimal? ask = null;
+            var blen = System.Math.Min(depth, _bids.Count);
+            var alen = System.Math.Min(depth, _asks.Count);
 
-            foreach (var kv in _bids) { bid = kv.Key; break; }
-            foreach (var kv in _asks) { ask = kv.Key; break; }
+            bids = new Level[blen];
+            asks = new Level[alen];
 
-            return (bid, ask);
-        }
-    }
-
-    public (List<(decimal p, decimal s)> bids, List<(decimal p, decimal s)> asks) Top(int n)
-    {
-        lock (_gate)
-        {
-            var b = new List<(decimal, decimal)>(n);
-            var a = new List<(decimal, decimal)>(n);
-
+            var i = 0;
             foreach (var kv in _bids)
             {
-                b.Add((kv.Key, kv.Value));
-                if (b.Count >= n) break;
+                if (i >= blen) break;
+                bids[i++] = new Level(kv.Key, kv.Value);
             }
 
+            i = 0;
             foreach (var kv in _asks)
             {
-                a.Add((kv.Key, kv.Value));
-                if (a.Count >= n) break;
+                if (i >= alen) break;
+                asks[i++] = new Level(kv.Key, kv.Value);
             }
 
-            return (b, a);
+            return true;
         }
     }
 }

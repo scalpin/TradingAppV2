@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿//MainWindow.xaml.cs
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -28,6 +29,8 @@ namespace TradingApp
         private CancellationTokenSource? _orderBookCts;
         private OrderBookScreenerService _screenerService;
 
+        private TradingRuntime? _runtime;
+
         // коллекции для DataGrid'ов
         private readonly ObservableCollection<OrderBookRow> _bids = new();
         private readonly ObservableCollection<OrderBookRow> _asks = new();
@@ -42,23 +45,6 @@ namespace TradingApp
             _tradeService = new TradeService(settings);
             _settingsService = new SettingsService();
 
-            /*
-            // заполнить ComboBox тикерами
-            TickerComboBox.ItemsSource = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT" };
-            TickerComboBox.SelectedIndex = 0; // сразу выберет SBER
-
-            // привязать DataGrid'ы к коллекциям
-            BidsGrid.ItemsSource = _bids;
-            AsksGrid.ItemsSource = _asks;
-
-            // повесить обработчик выбора тикера
-            TickerComboBox.SelectionChanged += TickerComboBox_SelectionChanged;
-
-            // запустить стакан для первого выбранного
-            StartOrderBookFor((string)TickerComboBox.SelectedItem!);
-            */
-
-            //
         }
 
         public class OrderBookRow
@@ -67,103 +53,37 @@ namespace TradingApp
             public long Quantity { get; set; }
         }
 
-        /*
-        private void TickerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (TickerComboBox.SelectedItem is string ticker)
-                StartOrderBookFor(ticker);
-        }
-        */
 
-        /*
-        private async void StartOrderBookFor(string ticker)
-        {
-            // отменяем предыдущую подписку
-            _orderBookCts?.Cancel();
-            _orderBookCts = new CancellationTokenSource();
-
-            // получаем FIGI
-            var figi = _settingsService.GetFigiByTicker(ticker);
-            if (figi == null) return;
-
-            // запускаем real‑time подписку
-            await _tradeService.SubscribeOrderBookAsync(
-                figi,
-                depth: 20,
-                onUpdate: ob =>
-                {
-                    // обновляем коллекции в UI‑потоке
-                    Dispatcher.Invoke(() =>
-                    {
-                        _bids.Clear();
-                        foreach (var b in ob.Bids)
-                        {
-                            _bids.Add(new OrderBookRow
-                            {
-                                Price = b.Price.Units + b.Price.Nano / 1e9,
-                                Quantity = b.Quantity
-                            });
-                        }
-
-                        _asks.Clear();
-                        foreach (var a in ob.Asks)
-                        {
-                            _asks.Add(new OrderBookRow
-                            {
-                                Price = a.Price.Units + a.Price.Nano / 1e9,
-                                Quantity = a.Quantity
-                            });
-                        }
-                    });
-                },
-                cancellationToken: _orderBookCts.Token
-            );
-        }
-        */
-
-        
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var settings = new SettingsService();
+            var secret = Environment.GetEnvironmentVariable("FINAM_SECRET");
+            if (string.IsNullOrWhiteSpace(secret))
+            {
+                // можешь вывести в лог/MessageBox
+                return;
+            }
 
-            
-            // Запуск скриннера
-            _screenerService = new OrderBookScreenerService(_tradeService.MarketDataStreamClient, settings, _tradeService);
-            await _screenerService.StartAsync();
-            
-            
+            _runtime = new TradingRuntime(secret);
+
+            // пока только один символ, чтобы увидеть в UI
+            // позже расширишь список или сделаешь динамическую подписку
+            var tickers = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT", "X5", "BELU", "RUAL",
+                      "MOEX", "MGNT", "AFKS", "ALRS", "HYDR", "SVCB", "MTSS", "SIBN", "TATN", "MAGN" };
+
+            var symbols = tickers.Select(t => $"{t}@MISX").ToArray();
+
+            await _runtime.StartAsync(symbols, s => System.Diagnostics.Debug.WriteLine(s));
+
+            // пробросим runtime во вьюхи
+            AutotradeView.SetRuntime(_runtime);
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            // отменить подписку при закрытии
-            _orderBookCts?.Cancel();
+            _runtime?.Dispose();
         }
-        
 
-        /*
-        private void ModeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (AutotradePanel == null || ScreenerPanel == null)
-            {
-                return;
-            }
 
-            if (ModeSelector.SelectedIndex == 0)
-            {
-                AutotradePanel.Visibility = System.Windows.Visibility.Visible;
-                ScreenerPanel.Visibility = System.Windows.Visibility.Collapsed;
-            }
-            else
-            {
-                AutotradePanel.Visibility = System.Windows.Visibility.Collapsed;
-                ScreenerPanel.Visibility = System.Windows.Visibility.Visible;
-            }
-        }
-        */
-       
-
-        
         public void BtnAuto_Click(object sender, RoutedEventArgs e)
         {
             BtnAuto.IsChecked = true;

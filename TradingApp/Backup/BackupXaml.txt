@@ -87,3 +87,56 @@
         </Grid>
     </DockPanel>
 </Window>
+
+
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Trading.Core\Trading.Core.csproj" />
+		<ProjectReference Include="..\Trading.Infrastructure.FinamV2\Trading.Infrastructure.FinamV2.csproj" />
+	</ItemGroup>
+	
+
+  <ItemGroup>
+    <None Remove="Resources\static\settings_icon2.png" />
+    <None Remove="Resources\static\settings_icon3.png" />
+    <None Remove="Services\settings.json" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Services\settings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Config\" />
+  </ItemGroup>
+
+
+	<ItemGroup>
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		<PackageReference Include="Tinkoff.InvestApi" Version="0.6.16" />
+	</ItemGroup>
+
+
+  <ItemGroup>
+    <Resource Include="Resources\static\settings_icon2.png" />
+    <Resource Include="Resources\static\settings_icon3.png" />
+    <Resource Include="Resources\Styles.xaml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+	
+</Project>

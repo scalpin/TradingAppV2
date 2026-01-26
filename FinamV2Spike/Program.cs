@@ -31,7 +31,24 @@ host.Trading.Trade += t =>
 
 var symbols = new[] { "SBER@MISX" };
 
+static void Observe(Task task, string name)
+{
+    task.ContinueWith(t =>
+    {
+        if (t.IsFaulted)
+            Console.WriteLine($"{name} faulted: {t.Exception}");
+        else if (t.IsCanceled)
+            Console.WriteLine($"{name} canceled");
+        else
+            Console.WriteLine($"{name} completed");
+    }, TaskScheduler.Default);
+}
+
 var started = await host.StartAsync(symbols, Console.WriteLine, cts.Token);
 Console.WriteLine($"accountId={started.accountId}");
+Observe(started.jwtTask, "jwt");
+Observe(started.tradeTask, "trade");
+Observe(started.bookTask, "book");
+
 
 await Task.Delay(Timeout.Infinite, cts.Token);

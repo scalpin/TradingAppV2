@@ -21,7 +21,7 @@
           "build/_._": {}
         }
       },
-      "Google.Protobuf/3.30.2": {
+      "Google.Protobuf/3.33.4": {
         "type": "package",
         "compile": {
           "lib/net5.0/Google.Protobuf.dll": {
@@ -34,7 +34,7 @@
           }
         }
       },
-      "Grpc.Core.Api/2.70.0": {
+      "Grpc.Core.Api/2.76.0": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/Grpc.Core.Api.dll": {
@@ -47,19 +47,19 @@
           }
         }
       },
-      "Grpc.Net.Client/2.70.0": {
+      "Grpc.Net.Client/2.76.0": {
         "type": "package",
         "dependencies": {
-          "Grpc.Net.Common": "2.70.0",
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Grpc.Net.Common": "2.76.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/Grpc.Net.Client.dll": {
+          "lib/net9.0/Grpc.Net.Client.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net8.0/Grpc.Net.Client.dll": {
+          "lib/net9.0/Grpc.Net.Client.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -81,27 +81,20 @@
           }
         }
       },
-      "Grpc.Net.Common/2.70.0": {
+      "Grpc.Net.Common/2.76.0": {
         "type": "package",
         "dependencies": {
-          "Grpc.Core.Api": "2.70.0"
+          "Grpc.Core.Api": "2.76.0"
         },
         "compile": {
-          "lib/net8.0/Grpc.Net.Common.dll": {
+          "lib/net9.0/Grpc.Net.Common.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net8.0/Grpc.Net.Common.dll": {
+          "lib/net9.0/Grpc.Net.Common.dll": {
             "related": ".pdb;.xml"
           }
-        }
-      },
-      "Grpc.Tools/2.71.0": {
-        "type": "package",
-        "build": {
-          "build/Grpc.Tools.props": {},
-          "build/Grpc.Tools.targets": {}
         }
       },
       "Microsoft.Extensions.DependencyInjection/6.0.0": {
@@ -124,20 +117,20 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
-      "Microsoft.Extensions.DependencyInjection.Abstractions/6.0.0": {
+      "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
             "related": ".xml"
           }
         },
         "build": {
-          "buildTransitive/netcoreapp3.1/_._": {}
+          "buildTransitive/net6.0/_._": {}
         }
       },
       "Microsoft.Extensions.Http/6.0.0": {
@@ -179,20 +172,23 @@
           }
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions/6.0.0": {
+      "Microsoft.Extensions.Logging.Abstractions/8.0.0": {
         "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
+        },
         "compile": {
-          "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.dll": {
+          "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.dll": {
+          "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll": {
             "related": ".xml"
           }
         },
         "build": {
-          "buildTransitive/netcoreapp3.1/_._": {}
+          "buildTransitive/net6.0/Microsoft.Extensions.Logging.Abstractions.targets": {}
         }
       },
       "Microsoft.Extensions.Options/6.0.0": {
@@ -284,6 +280,32 @@
             "related": ".xml"
           }
         }
+      },
+      "Trading.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Trading.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Trading.Core.dll": {}
+        }
+      },
+      "Trading.Infrastructure.FinamV2/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Google.Protobuf": "3.33.4",
+          "Grpc.Core.Api": "2.76.0",
+          "Grpc.Net.Client": "2.76.0",
+          "Trading.Core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Trading.Infrastructure.FinamV2.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Trading.Infrastructure.FinamV2.dll": {}
+        }
       }
     }
   },
@@ -364,14 +386,14 @@
         "lib/netstandard2.0/Google.Api.CommonProtos.xml"
       ]
     },
-    "Google.Protobuf/3.30.2": {
-      "sha512": "Y2aOVLIt75yeeEWigg9V9YnjsEm53sADtLGq0gLhwaXpk3iu8tYSoauolyhenagA2sWno2TQ2WujI0HQd6s1Vw==",
+    "Google.Protobuf/3.33.4": {
+      "sha512": "8uRKKkDp+0Clqz1GqH6aTQtQsDJJyWhw9Owo1jsplIdNR7SIPehLVq4+5zccXkjOVbR6OcjEvL4MlrVSTme2IA==",
       "type": "package",
-      "path": "google.protobuf/3.30.2",
+      "path": "google.protobuf/3.33.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "google.protobuf.3.30.2.nupkg.sha512",
+        "google.protobuf.3.33.4.nupkg.sha512",
         "google.protobuf.nuspec",
         "lib/net45/Google.Protobuf.dll",
         "lib/net45/Google.Protobuf.pdb",
@@ -387,15 +409,15 @@
         "lib/netstandard2.0/Google.Protobuf.xml"
       ]
     },
-    "Grpc.Core.Api/2.70.0": {
-      "sha512": "66UotvWcSIq41oiQhLWcQACyKPM4umxXNiht5DQTLZJfNwEswWOcS7Z0xIEHyNIBE7ZpjotH22bEjTkvhPxmVw==",
+    "Grpc.Core.Api/2.76.0": {
+      "sha512": "cSxC2tdnFdXXuBgIn1pjc4YBx7LXTCp4M0qn+SMBS35VWZY+cEQYLWTBDDhdBH1HzU7BV+ncVZlniGQHMpRJKQ==",
       "type": "package",
-      "path": "grpc.core.api/2.70.0",
+      "path": "grpc.core.api/2.76.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
-        "grpc.core.api.2.70.0.nupkg.sha512",
+        "grpc.core.api.2.76.0.nupkg.sha512",
         "grpc.core.api.nuspec",
         "lib/net462/Grpc.Core.Api.dll",
         "lib/net462/Grpc.Core.Api.pdb",
@@ -409,28 +431,28 @@
         "packageIcon.png"
       ]
     },
-    "Grpc.Net.Client/2.70.0": {
-      "sha512": "xNv0FFCVJa5S1beUtye82WFCxKThuE1jbN8DO1x1Rj8VSIWXLBUmfSID5a1fGzsU2R/EMfwPoWclJ2RMfQuGXw==",
+    "Grpc.Net.Client/2.76.0": {
+      "sha512": "K1oldmqw2+Gn69nGRzZLhqSiUZwelX1GrBu/cUl9wNf1C0uB61vFS6JcxUUv9P8VoUJhFsmV44JA6lI2EUt4xw==",
       "type": "package",
-      "path": "grpc.net.client/2.70.0",
+      "path": "grpc.net.client/2.76.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
-        "grpc.net.client.2.70.0.nupkg.sha512",
+        "grpc.net.client.2.76.0.nupkg.sha512",
         "grpc.net.client.nuspec",
+        "lib/net10.0/Grpc.Net.Client.dll",
+        "lib/net10.0/Grpc.Net.Client.pdb",
+        "lib/net10.0/Grpc.Net.Client.xml",
         "lib/net462/Grpc.Net.Client.dll",
         "lib/net462/Grpc.Net.Client.pdb",
         "lib/net462/Grpc.Net.Client.xml",
-        "lib/net6.0/Grpc.Net.Client.dll",
-        "lib/net6.0/Grpc.Net.Client.pdb",
-        "lib/net6.0/Grpc.Net.Client.xml",
-        "lib/net7.0/Grpc.Net.Client.dll",
-        "lib/net7.0/Grpc.Net.Client.pdb",
-        "lib/net7.0/Grpc.Net.Client.xml",
         "lib/net8.0/Grpc.Net.Client.dll",
         "lib/net8.0/Grpc.Net.Client.pdb",
         "lib/net8.0/Grpc.Net.Client.xml",
+        "lib/net9.0/Grpc.Net.Client.dll",
+        "lib/net9.0/Grpc.Net.Client.pdb",
+        "lib/net9.0/Grpc.Net.Client.xml",
         "lib/netstandard2.0/Grpc.Net.Client.dll",
         "lib/netstandard2.0/Grpc.Net.Client.pdb",
         "lib/netstandard2.0/Grpc.Net.Client.xml",
@@ -468,24 +490,24 @@
         "packageIcon.png"
       ]
     },
-    "Grpc.Net.Common/2.70.0": {
-      "sha512": "rBdEUMyCwa+iB8mqC6JKyPbj3SBHHkReJj/yy/XKJI63GcG6w9DJMMGTVcYHqq4Ci2W4m0HT4jt2pFfFscar8g==",
+    "Grpc.Net.Common/2.76.0": {
+      "sha512": "bZpiMVYgvpB44/wBh1RotrkqC7bg2FOasLri2GhR3hMKyzsiTxCoDE49YjPrJeFc4RW0wS8u+EInI09sjxVFRA==",
       "type": "package",
-      "path": "grpc.net.common/2.70.0",
+      "path": "grpc.net.common/2.76.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "grpc.net.common.2.70.0.nupkg.sha512",
+        "grpc.net.common.2.76.0.nupkg.sha512",
         "grpc.net.common.nuspec",
-        "lib/net6.0/Grpc.Net.Common.dll",
-        "lib/net6.0/Grpc.Net.Common.pdb",
-        "lib/net6.0/Grpc.Net.Common.xml",
-        "lib/net7.0/Grpc.Net.Common.dll",
-        "lib/net7.0/Grpc.Net.Common.pdb",
-        "lib/net7.0/Grpc.Net.Common.xml",
+        "lib/net10.0/Grpc.Net.Common.dll",
+        "lib/net10.0/Grpc.Net.Common.pdb",
+        "lib/net10.0/Grpc.Net.Common.xml",
         "lib/net8.0/Grpc.Net.Common.dll",
         "lib/net8.0/Grpc.Net.Common.pdb",
         "lib/net8.0/Grpc.Net.Common.xml",
+        "lib/net9.0/Grpc.Net.Common.dll",
+        "lib/net9.0/Grpc.Net.Common.pdb",
+        "lib/net9.0/Grpc.Net.Common.xml",
         "lib/netstandard2.0/Grpc.Net.Common.dll",
         "lib/netstandard2.0/Grpc.Net.Common.pdb",
         "lib/netstandard2.0/Grpc.Net.Common.xml",
@@ -493,55 +515,6 @@
         "lib/netstandard2.1/Grpc.Net.Common.pdb",
         "lib/netstandard2.1/Grpc.Net.Common.xml",
         "packageIcon.png"
-      ]
-    },
-    "Grpc.Tools/2.71.0": {
-      "sha512": "r8zHZm7kHdMrtujnkcuQ0BNDH2969at/8Va1ZzQgVblaQzR7tm8JlA3G+5Z5IFbvvf9PcAr1/VcoSR+g7j4Nyw==",
-      "type": "package",
-      "path": "grpc.tools/2.71.0",
-      "hasTools": true,
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "build/Grpc.Tools.props",
-        "build/Grpc.Tools.targets",
-        "build/_grpc/Grpc.CSharp.xml",
-        "build/_grpc/_Grpc.Tools.props",
-        "build/_grpc/_Grpc.Tools.targets",
-        "build/_protobuf/Google.Protobuf.Tools.props",
-        "build/_protobuf/Google.Protobuf.Tools.targets",
-        "build/_protobuf/Protobuf.CSharp.xml",
-        "build/_protobuf/net45/Protobuf.MSBuild.dll",
-        "build/_protobuf/net45/Protobuf.MSBuild.pdb",
-        "build/_protobuf/netstandard1.3/Protobuf.MSBuild.dll",
-        "build/_protobuf/netstandard1.3/Protobuf.MSBuild.pdb",
-        "build/native/include/google/protobuf/any.proto",
-        "build/native/include/google/protobuf/api.proto",
-        "build/native/include/google/protobuf/descriptor.proto",
-        "build/native/include/google/protobuf/duration.proto",
-        "build/native/include/google/protobuf/empty.proto",
-        "build/native/include/google/protobuf/field_mask.proto",
-        "build/native/include/google/protobuf/source_context.proto",
-        "build/native/include/google/protobuf/struct.proto",
-        "build/native/include/google/protobuf/timestamp.proto",
-        "build/native/include/google/protobuf/type.proto",
-        "build/native/include/google/protobuf/wrappers.proto",
-        "grpc.tools.2.71.0.nupkg.sha512",
-        "grpc.tools.nuspec",
-        "packageIcon.png",
-        "tools/linux_arm64/grpc_csharp_plugin",
-        "tools/linux_arm64/protoc",
-        "tools/linux_x64/grpc_csharp_plugin",
-        "tools/linux_x64/protoc",
-        "tools/linux_x86/grpc_csharp_plugin",
-        "tools/linux_x86/protoc",
-        "tools/macosx_x64/grpc_csharp_plugin",
-        "tools/macosx_x64/protoc",
-        "tools/windows_x64/grpc_csharp_plugin.exe",
-        "tools/windows_x64/protoc.exe",
-        "tools/windows_x86/grpc_csharp_plugin.exe",
-        "tools/windows_x86/protoc.exe"
       ]
     },
     "Microsoft.Extensions.DependencyInjection/6.0.0": {
@@ -569,27 +542,34 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/6.0.0": {
-      "sha512": "xlzi2IYREJH3/m6+lUrQlujzX8wDitm4QGnUu6kUXTQAWPuZY8i+ticFJbzfqaetLA6KR/rO6Ew/HuYD+bxifg==",
+    "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.0": {
+      "sha512": "cjWrLkJXK0rs4zofsK4bSdg+jhDLTaxrkXu4gS6Y7MAlCvRyNNgwY/lJi5RDlQOnSZweHqoyvgvbdvQsRIW+hg==",
       "type": "package",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/6.0.0",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/8.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
+        "PACKAGE.md",
         "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.DependencyInjection.Abstractions.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
         "buildTransitive/netcoreapp2.0/Microsoft.Extensions.DependencyInjection.Abstractions.targets",
-        "buildTransitive/netcoreapp3.1/_._",
-        "lib/net461/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/net461/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/net462/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net462/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
         "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
         "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
         "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
         "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512",
+        "microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
         "microsoft.extensions.dependencyinjection.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -634,15 +614,16 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Logging.Abstractions/6.0.0": {
-      "sha512": "/HggWBbTwy8TgebGSX5DBZ24ndhzi93sHUBDvP1IxbZD7FDokYzdAr6+vbWGjw2XAfR2EJ1sfKUotpjHnFWPxA==",
+    "Microsoft.Extensions.Logging.Abstractions/8.0.0": {
+      "sha512": "arDBqTgFCyS0EvRV7O3MZturChstm50OJ0y9bDJvAcmEPJm0FFpFyjU/JLYyStNGGey081DvnQYlncNX5SJJGA==",
       "type": "package",
-      "path": "microsoft.extensions.logging.abstractions/6.0.0",
+      "path": "microsoft.extensions.logging.abstractions/8.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
+        "PACKAGE.md",
         "THIRD-PARTY-NOTICES.TXT",
         "analyzers/dotnet/roslyn3.11/cs/Microsoft.Extensions.Logging.Generators.dll",
         "analyzers/dotnet/roslyn3.11/cs/cs/Microsoft.Extensions.Logging.Generators.resources.dll",
@@ -672,16 +653,36 @@
         "analyzers/dotnet/roslyn4.0/cs/tr/Microsoft.Extensions.Logging.Generators.resources.dll",
         "analyzers/dotnet/roslyn4.0/cs/zh-Hans/Microsoft.Extensions.Logging.Generators.resources.dll",
         "analyzers/dotnet/roslyn4.0/cs/zh-Hant/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "build/Microsoft.Extensions.Logging.Abstractions.targets",
+        "analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll",
+        "analyzers/dotnet/roslyn4.4/cs/cs/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/de/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/es/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/fr/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/it/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ja/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ko/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/pl/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/pt-BR/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ru/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/tr/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/zh-Hans/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/zh-Hant/Microsoft.Extensions.Logging.Generators.resources.dll",
+        "buildTransitive/net461/Microsoft.Extensions.Logging.Abstractions.targets",
+        "buildTransitive/net462/Microsoft.Extensions.Logging.Abstractions.targets",
+        "buildTransitive/net6.0/Microsoft.Extensions.Logging.Abstractions.targets",
         "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Logging.Abstractions.targets",
-        "buildTransitive/netcoreapp3.1/_._",
-        "lib/net461/Microsoft.Extensions.Logging.Abstractions.dll",
-        "lib/net461/Microsoft.Extensions.Logging.Abstractions.xml",
+        "buildTransitive/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.targets",
+        "lib/net462/Microsoft.Extensions.Logging.Abstractions.dll",
+        "lib/net462/Microsoft.Extensions.Logging.Abstractions.xml",
         "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.dll",
         "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.xml",
+        "lib/net7.0/Microsoft.Extensions.Logging.Abstractions.dll",
+        "lib/net7.0/Microsoft.Extensions.Logging.Abstractions.xml",
+        "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll",
+        "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.xml",
-        "microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512",
+        "microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
         "microsoft.extensions.logging.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -796,14 +797,23 @@
         "tinkoff.investapi.0.6.16.nupkg.sha512",
         "tinkoff.investapi.nuspec"
       ]
+    },
+    "Trading.Core/1.0.0": {
+      "type": "project",
+      "path": "../Trading.Core/Trading.Core.csproj",
+      "msbuildProject": "../Trading.Core/Trading.Core.csproj"
+    },
+    "Trading.Infrastructure.FinamV2/1.0.0": {
+      "type": "project",
+      "path": "../Trading.Infrastructure.FinamV2/Trading.Infrastructure.FinamV2.csproj",
+      "msbuildProject": "../Trading.Infrastructure.FinamV2/Trading.Infrastructure.FinamV2.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0-windows7.0": [
-      "Google.Protobuf >= 3.30.2",
-      "Grpc.Net.Client >= 2.70.0",
-      "Grpc.Tools >= 2.71.0",
-      "Tinkoff.InvestApi >= 0.6.16"
+      "Tinkoff.InvestApi >= 0.6.16",
+      "Trading.Core >= 1.0.0",
+      "Trading.Infrastructure.FinamV2 >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -837,7 +847,14 @@
       "frameworks": {
         "net9.0-windows7.0": {
           "targetAlias": "net9.0-windows",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\backupTAPP\\Trading.Core\\Trading.Core.csproj": {
+              "projectPath": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\backupTAPP\\Trading.Core\\Trading.Core.csproj"
+            },
+            "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\backupTAPP\\Trading.Infrastructure.FinamV2\\Trading.Infrastructure.FinamV2.csproj": {
+              "projectPath": "C:\\Users\\abros\\OneDrive\\Рабочий стол\\Учебная\\tradingBot\\backupTAPP\\Trading.Infrastructure.FinamV2\\Trading.Infrastructure.FinamV2.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -856,20 +873,6 @@
       "net9.0-windows7.0": {
         "targetAlias": "net9.0-windows",
         "dependencies": {
-          "Google.Protobuf": {
-            "target": "Package",
-            "version": "[3.30.2, )"
-          },
-          "Grpc.Net.Client": {
-            "target": "Package",
-            "version": "[2.70.0, )"
-          },
-          "Grpc.Tools": {
-            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[2.71.0, )"
-          },
           "Tinkoff.InvestApi": {
             "target": "Package",
             "version": "[0.6.16, )"

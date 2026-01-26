@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿//App.xaml.cs
+using System.Configuration;
 using System.Data;
 using System.Windows;
 

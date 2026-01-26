@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿//SettingsView.xaml.cs -->
+using System.Windows;
 using System.Windows.Controls;
 using TradingApp.Services;
 
