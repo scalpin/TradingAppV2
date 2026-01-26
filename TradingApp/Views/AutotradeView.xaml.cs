@@ -86,11 +86,15 @@ namespace TradingApp
 
         private void TickerListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TickerListBox.SelectedItem is string ticker)
-                _currentSymbol = ToFinamSymbol(ticker);
-                _lastSnap = null;
-                _bids.Clear();
-                _asks.Clear();
+            if (TickerListBox.SelectedItem is not string ticker)
+                return;
+
+            _currentSymbol = ToFinamSymbol(ticker);
+
+            // Сбрасываем отображение, чтобы не висел старый стакан от другого символа
+            _lastSnap = null;
+            _bids.Clear();
+            _asks.Clear();
         }
 
         private static string ToFinamSymbol(string ticker) => $"{ticker}@MISX";

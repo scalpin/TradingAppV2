@@ -12,7 +12,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="120"/>
-                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -27,6 +27,21 @@
                      Style="{StaticResource TickerListBoxStyle}"
                      ItemContainerStyle="{StaticResource TickerListBoxItemStyle}"
                      SelectionMode="Single"/>
+
+            <StackPanel Grid.Row="2" Margin="0,8,0,8">
+                <!-- Управление стратегией -->
+                <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,6">
+                    <Button x:Name="StartStrategyBtn" Content="Start" Width="70" Margin="3" Click="StartStrategy_Click"/>
+                    <Button x:Name="StopStrategyBtn"  Content="Stop"  Width="70" Margin="3" Click="StopStrategy_Click"/>
+                    <Button x:Name="PanicBtn"         Content="Panic" Width="70" Margin="3" Click="Panic_Click"/>
+                </WrapPanel>
+
+                <!-- Ручной smoke для цикла сделки -->
+                <WrapPanel HorizontalAlignment="Center">
+                    <Button x:Name="TestBuyBtn"  Content="Test Buy"  Width="90" Margin="3" Click="TestBuy_Click"/>
+                    <Button x:Name="TestSellBtn" Content="Test Sell" Width="90" Margin="3" Click="TestSell_Click"/>
+                </WrapPanel>
+            </StackPanel>
 
             <TextBlock Text="Журнал"
                        FontWeight="Bold"
