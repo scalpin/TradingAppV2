@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using Trading.Core.Interfaces;
 using Trading.Core.Models;
+using Trading.Core.Trading;
 
 namespace Trading.Core.Trading;
 
@@ -66,7 +67,7 @@ public sealed class ScalperEngine : IDisposable
         if (_cts == null)
             throw new InvalidOperationException("strategy is not running");
 
-        await RunCycleAsync(symbol, new DensitySignal(symbol, side, price: 0, size: 0), manual: true, _cts.Token);
+        await RunCycleAsync(symbol, new DensitySignal(symbol, side, 0m, 0m), manual: true, _cts.Token);
     }
 
     public async Task PanicAsync()

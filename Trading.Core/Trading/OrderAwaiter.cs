@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using Trading.Core.Models;
 
+
+namespace Trading.Core.Trading;
+
 public sealed class OrderAwaiter
 {
     private readonly ConcurrentDictionary<string, TaskCompletionSource<OrderUpdate>> _final = new();

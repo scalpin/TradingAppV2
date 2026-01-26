@@ -34,6 +34,8 @@ namespace TradingApp
         private string _currentSymbol = "SBER@MISX";
         private OrderBookSnapshot? _lastSnap;
 
+        private Trading.Core.Trading.ScalperEngine? _scalper;
+
         // коллекции для DataGrid'ов
         private readonly ObservableCollection<OrderBookRow> _bids = new();
         private readonly ObservableCollection<OrderBookRow> _asks = new();
@@ -101,12 +103,16 @@ namespace TradingApp
 
         public void SetRuntime(TradingRuntime rt)
         {
+            if (_rt != null) return; // защита от повторной инициализации
+
             _rt = rt;
 
-            // подписываемся один раз
             _rt.MarketData.OrderBook += OnOrderBook;
             _rt.Trading.OrderUpdated += OnOrderUpdated;
             _rt.Trading.Trade += OnTrade;
+
+            // Движок стратегии. Логи — в тот же журнал, что и сделки
+            _scalper = new Trading.Core.Trading.ScalperEngine(_rt.MarketData, _rt.Trading, Log);
         }
 
         private void OnOrderBook(OrderBookSnapshot snap)
@@ -130,5 +136,50 @@ namespace TradingApp
 
         private void OnTrade(TradeUpdate t) =>
             Log($"trade {t.TradeId} {t.Symbol} {t.Side} {t.Price} x {t.Qty}");
+
+
+        private void StartStrategy_Click(object sender, RoutedEventArgs e)
+        {
+            if (_rt == null || _scalper == null) return;
+
+            // Пока хардкод. Потом вытащишь в SettingsView.
+            var settings = new Trading.Core.Trading.ScalperSettings
+            {
+                Qty = 1m,
+                DensityMinSize = 3000m,
+                TakeProfitPct = 0.001m,
+                BreakFactor = 0.5m,
+                CooldownMs = 2000,
+                Depth = 20,
+                BreakCheckMs = 200
+            };
+
+            _scalper.Start(_rt.AccountId, settings);
+            Log("strategy start pressed");
+        }
+
+        private void StopStrategy_Click(object sender, RoutedEventArgs e)
+        {
+            _scalper?.Stop();
+            Log("strategy stop pressed");
+        }
+
+        private async void Panic_Click(object sender, RoutedEventArgs e)
+        {
+            if (_scalper == null) return;
+            await _scalper.PanicAsync();
+        }
+
+        private async void TestBuy_Click(object sender, RoutedEventArgs e)
+        {
+            if (_scalper == null) return;
+            await _scalper.ManualTestAsync(_currentSymbol, Side.Buy);
+        }
+
+        private async void TestSell_Click(object sender, RoutedEventArgs e)
+        {
+            if (_scalper == null) return;
+            await _scalper.ManualTestAsync(_currentSymbol, Side.Sell);
+        }
     }
 }
