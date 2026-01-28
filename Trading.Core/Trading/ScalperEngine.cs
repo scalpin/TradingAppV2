@@ -15,6 +15,7 @@ public sealed class ScalperEngine : IDisposable
 {
     private readonly IMarketDataFeed _md;
     private readonly ITradingGateway _trading;
+    private readonly ILiquidityProvider _liq;
     private readonly Action<string> _log;
 
     private readonly OrderAwaiter _awaiter = new();
@@ -26,15 +27,16 @@ public sealed class ScalperEngine : IDisposable
     private ScalperSettings _settings = new();
     private string _accountId = "";
 
+
     public bool IsRunning => _cts != null;
 
-    public ScalperEngine(IMarketDataFeed md, ITradingGateway trading, Action<string> log)
+    public ScalperEngine(IMarketDataFeed md, ITradingGateway trading, ILiquidityProvider liq, Action<string> log)
     {
         _md = md;
         _trading = trading;
+        _liq = liq;
         _log = log;
 
-        // События — это твой "источник истины". Поллинга тут быть не должно.
         _md.OrderBook += OnOrderBook;
         _trading.OrderUpdated += _awaiter.OnOrderUpdate;
     }
@@ -47,7 +49,7 @@ public sealed class ScalperEngine : IDisposable
         _settings = settings;
 
         _cts = new CancellationTokenSource();
-        _log($"strategy started, qty={settings.Qty}, minDensity={settings.DensityMinSize}");
+        _log($"strategy started, qty={settings.Qty}, window={settings.LiquidityWindowMinutes}m, coef={settings.DensityCoef}");
     }
 
     public void Stop()
@@ -97,25 +99,36 @@ public sealed class ScalperEngine : IDisposable
         _log("panic done");
     }
 
+    private readonly ConcurrentDictionary<string, DateTimeOffset> _lastSeen = new();
+
     private void OnOrderBook(OrderBookSnapshot snap)
     {
         _lastSnap[snap.Symbol] = snap;
 
-        // Если стратегия не запущена — просто храним снапшоты (для UI/ручного теста)
+        /*
+         * 
+        // лог всех тикеров в скринере
+
+        var now = DateTimeOffset.UtcNow;
+        var prev = _lastSeen.GetOrAdd(snap.Symbol, now);
+
+        if ((now - prev).TotalSeconds >= 5)
+        {
+            _lastSeen[snap.Symbol] = now;
+            _log($"md ok: {snap.Symbol} bids={snap.Bids.Count} asks={snap.Asks.Count}");
+        }
+        */
+
         var cts = _cts;
         if (cts == null) return;
 
         var session = _sessions.GetOrAdd(snap.Symbol, s => new SymbolSession(s));
-
-        // Защита от параллельного запуска цикла по одному символу
         if (!session.TryEnterCooldown(_settings.CooldownMs))
             return;
 
-        // Детектор плотностей
-        if (!DensityDetector.TryFind(snap, _settings, out var signal))
+        if (!DensityDetector.TryFind(snap, _settings, _liq, out var signal))
             return;
 
-        // Запускаем сделку в фоне. OnOrderBook должен быть быстрым.
         _ = Observe(RunCycleAsync(snap.Symbol, signal, manual: false, cts.Token),
             $"cycle faulted {snap.Symbol}");
     }
@@ -169,23 +182,57 @@ public sealed class ScalperEngine : IDisposable
         var session = _sessions.GetOrAdd(symbol, s => new SymbolSession(s));
         var qty = _settings.Qty;
 
-        // 1) Выставляем entry лимитку
-        var entryClientId = $"bot-entry-{symbol}-{Guid.NewGuid():N}";
-        var entryOrderId = await _trading.PlaceLimitAsync(_accountId, symbol, entrySide, entryPrice, qty, entryClientId, ct);
-        session.EntryOrderId = entryOrderId;
-
-        _log($"{symbol} entry placed {entrySide} p={entryPrice} id={entryOrderId}");
-
-        // 2) Ждём финальный статус entry (без поллинга, только через стрим)
-        var entryFinal = await _awaiter.WaitFinalAsync(entryOrderId, ct);
-
-        _log($"{symbol} entry final {entryFinal.Status} id={entryOrderId}");
-
-        if (entryFinal.Status != OrderStatus.Filled)
+        // Finam: client_order_id <= 20 символов
+        // Делаем стабильный короткий id: 1 префикс + 19 символов GUID = 20
+        static string ShortClientId(char prefix)
         {
-            // Не вошли — нечего сопровождать
+            var g = Guid.NewGuid().ToString("N");     // 32 hex
+            return prefix + g.Substring(0, 19);       // итого 20
+        }
+
+        string entryOrderId;
+        try
+        {
+            // 1) Выставляем entry лимитку
+            var entryClientId = ShortClientId('E');
+            entryOrderId = await _trading.PlaceLimitAsync(
+                _accountId,
+                symbol,
+                entrySide,
+                entryPrice,
+                qty,
+                entryClientId,
+                ct);
+
+            session.EntryOrderId = entryOrderId;
+            _log($"{symbol} entry placed {entrySide} p={entryPrice} id={entryOrderId} cid={entryClientId}");
+        }
+        catch (Exception ex)
+        {
+            _log($"{symbol} entry place failed: {ex.GetType().Name}: {ex.Message}");
             return;
         }
+
+        OrderUpdate entryFinal;
+        try
+        {
+            // 2) Ждём финальный статус entry через стрим (без поллинга)
+            entryFinal = await _awaiter.WaitFinalAsync(entryOrderId, ct);
+            _log($"{symbol} entry final {entryFinal.Status} id={entryOrderId}");
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            _log($"{symbol} entry wait canceled id={entryOrderId}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            _log($"{symbol} entry wait failed: {ex.GetType().Name}: {ex.Message}");
+            return;
+        }
+
+        if (entryFinal.Status != OrderStatus.Filled)
+            return;
 
         // 3) Ставим тейк
         var tpSide = entrySide == Side.Buy ? Side.Sell : Side.Buy;
@@ -193,13 +240,29 @@ public sealed class ScalperEngine : IDisposable
             ? entryPrice * (1m + _settings.TakeProfitPct)
             : entryPrice * (1m - _settings.TakeProfitPct);
 
-        var tpClientId = $"bot-tp-{symbol}-{Guid.NewGuid():N}";
-        var tpOrderId = await _trading.PlaceLimitAsync(_accountId, symbol, tpSide, tpPrice, qty, tpClientId, ct);
-        session.TpOrderId = tpOrderId;
+        string tpOrderId;
+        try
+        {
+            var tpClientId = ShortClientId('T');
+            tpOrderId = await _trading.PlaceLimitAsync(
+                _accountId,
+                symbol,
+                tpSide,
+                tpPrice,
+                qty,
+                tpClientId,
+                ct);
 
-        _log($"{symbol} tp placed {tpSide} p={tpPrice} id={tpOrderId}");
+            session.TpOrderId = tpOrderId;
+            _log($"{symbol} tp placed {tpSide} p={tpPrice} id={tpOrderId} cid={tpClientId}");
+        }
+        catch (Exception ex)
+        {
+            _log($"{symbol} tp place failed: {ex.GetType().Name}: {ex.Message}");
+            return;
+        }
 
-        // 4) Одновременно ждём: либо тейк исполнился, либо плотность развалилась
+        // 4) Ждём: либо тейк, либо развал плотности
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct);
 
         var tpFinalTask = _awaiter.WaitFinalAsync(tpOrderId, ct);
@@ -209,11 +272,19 @@ public sealed class ScalperEngine : IDisposable
 
         if (done == tpFinalTask)
         {
-            // Тейк завершился — отменяем мониторинг развала
+            // Тейк завершился — стопаем мониторинг развала
             linked.Cancel();
 
-            var tpFinal = await tpFinalTask;
-            _log($"{symbol} tp final {tpFinal.Status} id={tpOrderId}");
+            try
+            {
+                var tpFinal = await tpFinalTask;
+                _log($"{symbol} tp final {tpFinal.Status} id={tpOrderId}");
+            }
+            catch (Exception ex)
+            {
+                _log($"{symbol} tp wait failed: {ex.GetType().Name}: {ex.Message}");
+            }
+
             return;
         }
 
@@ -224,14 +295,30 @@ public sealed class ScalperEngine : IDisposable
         {
             await _trading.CancelAsync(_accountId, tpOrderId, CancellationToken.None);
         }
-        catch
+        catch (Exception ex)
         {
-            // Если не успели отменить — бывает, дальше всё равно пробуем закрыться
+            _log($"{symbol} tp cancel failed (ok): {ex.GetType().Name}: {ex.Message}");
         }
 
-        await _trading.PlaceMarketAsync(_accountId, symbol, tpSide, qty, $"bot-exit-{symbol}-{Guid.NewGuid():N}", ct);
-        _log($"{symbol} market exit sent {tpSide} qty={qty}");
+        try
+        {
+            var exitClientId = ShortClientId('X');
+            await _trading.PlaceMarketAsync(
+                _accountId,
+                symbol,
+                tpSide,
+                qty,
+                exitClientId,
+                ct);
+
+            _log($"{symbol} market exit sent {tpSide} qty={qty} cid={exitClientId}");
+        }
+        catch (Exception ex)
+        {
+            _log($"{symbol} market exit failed: {ex.GetType().Name}: {ex.Message}");
+        }
     }
+
 
     private async Task WaitDensityBreakAsync(string symbol, CancellationToken ct)
     {

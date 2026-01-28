@@ -18,12 +18,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Services\settings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
 		<Resource Include="Resources\static\settings_icon2.png" />
 		<Resource Include="Resources\static\settings_icon3.png" />
 	</ItemGroup>

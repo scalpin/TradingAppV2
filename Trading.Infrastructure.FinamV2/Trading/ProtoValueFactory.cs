@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace Trading.Infrastructure.FinamV2.Trading;
 
-internal static class ProtoValueFactory
+public static class ProtoValueFactory
 {
     private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 

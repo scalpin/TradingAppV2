@@ -41,6 +41,8 @@
 
 		<Protobuf Include="..\proto\grpc\tradeapi\v1\marketdata\marketdata_service.proto" GrpcServices="Client" ProtoRoot="..\proto" />
 
+		<Protobuf Include="..\proto\grpc\tradeapi\v1\assets\assets_service.proto" GrpcServices="Client" ProtoRoot="..\proto" />
+
 		<!-- Зависимости: компилировать НЕ нужно как сервисы, но файлы должны быть видны для import -->
 		<Protobuf Include="..\proto\google\**\*.proto" GrpcServices="None" ProtoRoot="..\proto" />
 	</ItemGroup>

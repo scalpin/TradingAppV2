@@ -20,6 +20,7 @@ using Google.Api;
 using static TradingApp.MainWindow;
 using Trading.Core.Models;
 using System.Threading;
+using Trading.Core.Trading;
 
 namespace TradingApp
 {
@@ -41,7 +42,7 @@ namespace TradingApp
         private readonly ObservableCollection<OrderBookRow> _asks = new();
 
         private readonly string[] _tickers = { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT", "X5", "BELU", "RUAL",
-                                               "MOEX", "MGNT", "AFKS",  "ALRS", "HYDR",  "SVCB", "MTSS", "SIBN", "TATN", "MAGN"};
+                                               "MOEX", "MGNT", "AFKS",  "ALRS", "HYDR",  "SVCB", "MTSS", "SIBN", "TATN", "MAGN", "IRAO", "CHMF"};
 
         private readonly System.Windows.Threading.DispatcherTimer _uiTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
 
@@ -112,7 +113,7 @@ namespace TradingApp
             _rt.Trading.Trade += OnTrade;
 
             // Движок стратегии. Логи — в тот же журнал, что и сделки
-            _scalper = new Trading.Core.Trading.ScalperEngine(_rt.MarketData, _rt.Trading, Log);
+            _scalper = new ScalperEngine(_rt.MarketData, _rt.Trading, _rt.Liquidity, Log);
         }
 
         private void OnOrderBook(OrderBookSnapshot snap)
@@ -142,11 +143,15 @@ namespace TradingApp
         {
             if (_rt == null || _scalper == null) return;
 
-            // Пока хардкод. Потом вытащишь в SettingsView.
             var settings = new Trading.Core.Trading.ScalperSettings
             {
                 Qty = 1m,
-                DensityMinSize = 3000m,
+
+                LiquidityWindowMinutes = 5,
+                DensityCoef = 1m,
+                OrderBookSizeIsLots = true,
+                MinDayVolumeShares = 100_000m,
+
                 TakeProfitPct = 0.001m,
                 BreakFactor = 0.5m,
                 CooldownMs = 2000,

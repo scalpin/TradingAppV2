@@ -65,10 +65,10 @@ namespace TradingApp
 
             _runtime = new TradingRuntime(secret);
 
-            // пока только один символ, чтобы увидеть в UI
             // позже расширишь список или сделаешь динамическую подписку
+
             var tickers = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT", "X5", "BELU", "RUAL",
-                      "MOEX", "MGNT", "AFKS", "ALRS", "HYDR", "SVCB", "MTSS", "SIBN", "TATN", "MAGN" };
+                      "MOEX", "MGNT", "AFKS", "ALRS", "HYDR", "SVCB", "MTSS", "SIBN", "TATN", "MAGN", "IRAO", "CHMF" };
 
             var symbols = tickers.Select(t => $"{t}@MISX").ToArray();
 

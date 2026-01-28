@@ -5,43 +5,68 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Trading.Core.Models;
+using System;
+using System.Linq;
+using Trading.Core.Interfaces;
 
 namespace Trading.Core.Trading;
 
 public static class DensityDetector
 {
-    public static bool TryFind(OrderBookSnapshot snap, ScalperSettings s, out DensitySignal signal)
+
+    public static bool TryFind(
+        OrderBookSnapshot snap,
+        ScalperSettings settings,
+        ILiquidityProvider liq,
+        out DensitySignal signal)
     {
-        // Ищем кандидата в bids (плотность на покупку)
-        var bid = snap.Bids.Take(s.Depth).FirstOrDefault(l => l.Size >= s.DensityMinSize);
+        signal = default;
 
-        // Ищем кандидата в asks (плотность на продажу)
-        var ask = snap.Asks.Take(s.Depth).FirstOrDefault(l => l.Size >= s.DensityMinSize);
-
-        // Ничего нет
-        if (bid is null && ask is null)
-        {
-            signal = default;
+        if (!liq.TryGet(snap.Symbol, DateTimeOffset.UtcNow, settings.LiquidityWindowMinutes, out var lq))
             return false;
-        }
 
-        // Если есть оба — берём тот, у которого объём больше (грубый, но рабочий критерий)
-        if (bid is not null && ask is not null)
+        if (lq.DayVolumeShares < settings.MinDayVolumeShares)
+            return false;
+
+
+
+        var thresholdShares = lq.AvgWindowVolumeShares * settings.DensityCoef;
+
+        var depth = Math.Max(1, settings.Depth);
+
+        bool have = false;
+        Side bestSide = Side.Buy;
+        Level bestLvl = default;
+        decimal bestShares = 0m;
+
+        foreach (var b in snap.Bids.Take(depth))
         {
-            signal = bid.Size >= ask.Size
-                ? new DensitySignal(snap.Symbol, Side.Buy, bid.Price, bid.Size)
-                : new DensitySignal(snap.Symbol, Side.Sell, ask.Price, ask.Size);
-            return true;
+            var shares = settings.OrderBookSizeIsLots ? b.Size * lq.LotSize : b.Size;
+            if (!have || shares > bestShares)
+            {
+                have = true;
+                bestSide = Side.Buy;
+                bestLvl = b;
+                bestShares = shares;
+            }
         }
 
-        // Есть только один
-        if (bid is not null)
+        foreach (var a in snap.Asks.Take(depth))
         {
-            signal = new DensitySignal(snap.Symbol, Side.Buy, bid.Price, bid.Size);
-            return true;
+            var shares = settings.OrderBookSizeIsLots ? a.Size * lq.LotSize : a.Size;
+            if (!have || shares > bestShares)
+            {
+                have = true;
+                bestSide = Side.Sell;
+                bestLvl = a;
+                bestShares = shares;
+            }
         }
 
-        signal = new DensitySignal(snap.Symbol, Side.Sell, ask!.Price, ask.Size);
+        if (!have) return false;
+        if (bestShares < thresholdShares) return false;
+
+        signal = new DensitySignal(snap.Symbol, bestSide, bestLvl.Price, bestLvl.Size);
         return true;
     }
 }

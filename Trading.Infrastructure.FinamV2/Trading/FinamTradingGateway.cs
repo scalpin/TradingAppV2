@@ -39,7 +39,7 @@ public sealed class FinamTradingGateway : ITradingGateway
         {
             AccountId = accountId,
             Symbol = symbol,
-            ClientOrderId = clientOrderId ?? Guid.NewGuid().ToString("N"),
+            ClientOrderId = BuildClientOrderId(clientOrderId, "L"), // L = limit
         };
 
         // Quantity
@@ -69,7 +69,7 @@ public sealed class FinamTradingGateway : ITradingGateway
         {
             AccountId = accountId,
             Symbol = symbol,
-            ClientOrderId = clientOrderId ?? Guid.NewGuid().ToString("N"),
+            ClientOrderId = BuildClientOrderId(clientOrderId, "M"), // M = market
         };
 
         var qProp = typeof(Order).GetProperty(nameof(Order.Quantity))!;
@@ -168,5 +168,32 @@ public sealed class FinamTradingGateway : ITradingGateway
                 await Task.Delay(300, ct);
             }
         }
+    }
+
+    private const int MaxClientOrderIdLen = 20;
+
+    private static string BuildClientOrderId(string? requested, string prefix)
+    {
+        // 1) если пользователь дал id — чистим и режем до 20
+        if (!string.IsNullOrWhiteSpace(requested))
+        {
+            // Finam обычно нормально ест [A-Za-z0-9], поэтому выкидываем мусор
+            var cleaned = new string(requested.Where(char.IsLetterOrDigit).ToArray());
+            if (string.IsNullOrWhiteSpace(cleaned))
+                cleaned = prefix;
+
+            return cleaned.Length <= MaxClientOrderIdLen
+                ? cleaned
+                : cleaned.Substring(0, MaxClientOrderIdLen);
+        }
+
+        // 2) иначе генерим короткий id: PREFIX + кусок GUID
+        prefix = string.IsNullOrWhiteSpace(prefix) ? "X" : prefix;
+
+        var guid = Guid.NewGuid().ToString("N"); // 32 hex
+        var take = MaxClientOrderIdLen - prefix.Length;
+        if (take <= 0) return prefix.Substring(0, MaxClientOrderIdLen);
+
+        return prefix + guid.Substring(0, take);
     }
 }

@@ -54,13 +54,11 @@ C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backup
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\Views\ScreenerView.g.cs
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\Views\SettingsView.g.cs
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\App.g.cs
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\TradingApp_Content.g.cs
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\TradingApp_MarkupCompile.cache
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\TradingApp_MarkupCompile.lref
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\obj\Debug\net9.0-windows\Resources\Styles.baml
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\bin\Debug\net9.0-windows\TradingApp.exe
-C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\bin\Debug\net9.0-windows\Services\settings.json
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\bin\Debug\net9.0-windows\TradingApp.deps.json
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\bin\Debug\net9.0-windows\TradingApp.runtimeconfig.json
 C:\Users\abros\OneDrive\Рабочий стол\Учебная\tradingBot\backupTAPP\TradingApp\bin\Debug\net9.0-windows\TradingApp.dll

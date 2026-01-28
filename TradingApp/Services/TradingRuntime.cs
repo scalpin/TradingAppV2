@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Trading.Infrastructure.FinamV2.Trading;
+using Trading.Infrastructure.FinamV2.MarketData;
 using Trading.Infrastructure.FinamV2;
 using Trading.Core.Interfaces;
 
@@ -17,7 +18,16 @@ public sealed class TradingRuntime : IDisposable
 
     public string AccountId { get; private set; } = "";
 
-    public TradingRuntime(string secret) => _host = new FinamV2Host(secret);
+    public IMarketDataFeed MarketData => _host.OrderBookFeed;
+    public ITradingGateway Trading => _host.Trading;
+
+    // вот это тебе и нужно
+    public ILiquidityProvider Liquidity => _host.Liquidity;
+
+    public TradingRuntime(string secret)
+    {
+        _host = new FinamV2Host(secret);
+    }
 
     public async Task StartAsync(IEnumerable<string> symbols, Action<string> log)
     {
@@ -28,9 +38,13 @@ public sealed class TradingRuntime : IDisposable
         var started = await _host.StartAsync(symbols, log, _cts.Token);
         AccountId = started.accountId;
 
-        Observe(started.jwtTask, "jwt", log);
-        Observe(started.tradeTask, "trade", log);
-        Observe(started.bookTask, "book", log);
+        // не await, просто держим живыми
+        _ = started.jwtTask;
+        _ = started.tradeTask;
+        _ = started.bookTask;
+
+        // если ты добавил liqTask в StartAsync — тоже
+        // _ = started.liqTask;
     }
 
     public void Stop()
@@ -44,18 +58,5 @@ public sealed class TradingRuntime : IDisposable
     {
         Stop();
         _host.Channel.Dispose();
-    }
-
-    public IMarketDataFeed MarketData => _host.OrderBookFeed;
-    public ITradingGateway Trading => _host.Trading;
-
-    private static void Observe(Task t, string name, Action<string> log)
-    {
-        t.ContinueWith(x =>
-        {
-            if (x.IsFaulted) log($"{name} faulted: {x.Exception}");
-            else if (x.IsCanceled) log($"{name} canceled");
-            else log($"{name} completed");
-        }, TaskScheduler.Default);
     }
 }
