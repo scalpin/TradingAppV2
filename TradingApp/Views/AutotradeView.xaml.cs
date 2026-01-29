@@ -146,6 +146,7 @@ namespace TradingApp
             var settings = new Trading.Core.Trading.ScalperSettings
             {
                 Qty = 1m,
+                OrderQtyIsLots = true,
 
                 LiquidityWindowMinutes = 5,
                 DensityCoef = 1m,

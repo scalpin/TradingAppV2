@@ -1,4 +1,5 @@
-﻿using System;
+﻿//FinamLiquidityProvider.cs
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ using Trading.Core.Interfaces;
 using Trading.Infrastructure.FinamV2.FinamGrpc;
 using Grpc.Tradeapi.V1.Assets;
 using Grpc.Tradeapi.V1.Marketdata;
+using System.Globalization;
 
 namespace Trading.Infrastructure.FinamV2.MarketData;
 
@@ -20,8 +22,12 @@ public sealed class FinamLiquidityProvider : ILiquidityProvider
     private readonly MarketDataService.MarketDataServiceClient _md;
     private readonly JwtProvider _jwt;
 
+    private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
+
     private readonly ConcurrentDictionary<string, decimal> _lotSize = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, decimal> _priceStep = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, decimal> _dayVolume = new(StringComparer.OrdinalIgnoreCase);
+
     private readonly ConcurrentDictionary<string, (DateTimeOffset startUtc, DateTimeOffset endUtc)[]> _sessions = new(StringComparer.OrdinalIgnoreCase);
 
     public FinamLiquidityProvider(GrpcChannel channel, JwtProvider jwt)
@@ -93,14 +99,34 @@ public sealed class FinamLiquidityProvider : ILiquidityProvider
                 headers: _jwt.GetHeaders(),
                 cancellationToken: ct);
 
+            // lot_size: google.type.Decimal { value: "..." }
             var lot = ProtoDecimal.Parse(resp.LotSize?.Value) ?? 1m;
             if (lot <= 0) lot = 1m;
-
             _lotSize[symbol] = lot;
+
+            // min_step: long, decimals: int
+            decimal step = 0m;
+
+            try
+            {
+                var scale = Pow10(resp.Decimals);
+                if (scale > 0)
+                    step = (decimal)resp.MinStep / scale;
+            }
+            catch
+            {
+                step = 0m;
+            }
+
+            if (step > 0)
+                _priceStep[symbol] = step;
+            else
+                log($"price_step not parsed for {symbol}: min_step={resp.MinStep} decimals={resp.Decimals}");
+
         }
         catch (Exception ex) when (!ct.IsCancellationRequested)
         {
-            log($"lot_size load failed {symbol}: {ex.GetType().Name}: {ex.Message}");
+            log($"asset meta load failed {symbol}: {ex.GetType().Name}: {ex.Message}");
             _lotSize[symbol] = 1m;
         }
     }
@@ -219,6 +245,13 @@ public sealed class FinamLiquidityProvider : ILiquidityProvider
         return s;
     }
 
+    private static decimal Pow10(int decimals)
+    {
+        decimal p = 1m;
+        for (int i = 0; i < decimals; i++) p *= 10m;
+        return p;
+    }
+
     public bool TryGet(string symbol, DateTimeOffset nowUtc, int windowMinutes, out LiquiditySnapshot snap)
     {
         snap = default;
@@ -230,10 +263,9 @@ public sealed class FinamLiquidityProvider : ILiquidityProvider
         var okSes = _sessions.TryGetValue(key, out var sessions);
 
         if (!okLot || !okVol || !okSes)
-        {
-            // поставь брейкпоинт сюда и посмотри какие false
             return false;
-        }
+
+        _priceStep.TryGetValue(key, out var step); // может быть 0 — это ок, скальпер сможет вывести из стакана
 
         var elapsed = ComputeElapsedMinutes(sessions, nowUtc);
         if (elapsed <= 0.0) return false;
@@ -241,7 +273,13 @@ public sealed class FinamLiquidityProvider : ILiquidityProvider
         var w = Math.Max(1, windowMinutes);
         var avg = dayVol * w / (decimal)elapsed;
 
-        snap = new LiquiditySnapshot(lot, dayVol, elapsed, avg);
+        snap = new LiquiditySnapshot(
+            LotSize: lot,
+            DayVolumeShares: dayVol,
+            PriceStep: step,
+            ElapsedTradingMinutes: elapsed,
+            AvgWindowVolumeShares: avg);
+
         return true;
     }
 

@@ -158,7 +158,7 @@ public sealed class ScalperEngine : IDisposable
                 var entrySide = signal.Side;
                 var entryPrice = entrySide == Side.Buy ? bb.Price * 0.98m : ba.Price * 1.02m;
 
-                await RunTradeLifecycle(symbol, entrySide, entryPrice, ct);
+                await RunTradeLifecycle(symbol, entrySide, entryPrice, offsetFromDensity: false, ct);
                 return;
             }
 
@@ -169,7 +169,7 @@ public sealed class ScalperEngine : IDisposable
 
             _log($"{symbol} density {signal.Side} p={signal.Price} size={signal.Size}");
 
-            await RunTradeLifecycle(symbol, signal.Side, signal.Price, ct);
+            await RunTradeLifecycle(symbol, signal.Side, signal.Price, offsetFromDensity: true, ct);
         }
         finally
         {
@@ -177,10 +177,50 @@ public sealed class ScalperEngine : IDisposable
         }
     }
 
-    private async Task RunTradeLifecycle(string symbol, Side entrySide, decimal entryPrice, CancellationToken ct)
+    private async Task RunTradeLifecycle(string symbol, Side entrySide, decimal baseEntryPrice, bool offsetFromDensity, CancellationToken ct)
     {
         var session = _sessions.GetOrAdd(symbol, s => new SymbolSession(s));
-        var qty = _settings.Qty;
+
+        if (!_lastSnap.TryGetValue(symbol, out var snap))
+            return;
+
+        if (!_liq.TryGet(symbol, DateTimeOffset.UtcNow, _settings.LiquidityWindowMinutes, out var lq))
+            return;
+
+        // qty из настроек
+        var qtyRaw = _settings.Qty;
+
+        // конвертим "лоты -> бумаги", если надо
+        var orderQty = _settings.OrderQtyIsLots ? qtyRaw * lq.LotSize : qtyRaw;
+
+        // финам обычно хочет целое число бумаг
+        if (orderQty <= 0 || orderQty != decimal.Truncate(orderQty))
+        {
+            _log($"{symbol} bad qty: settings={qtyRaw} lotSize={lq.LotSize} -> shares={orderQty}");
+            return;
+        }
+
+        var qty = orderQty;
+        _log($"{symbol} qty: settings={qtyRaw} lotSize={lq.LotSize} -> shares={qty}");
+
+        var step = lq.PriceStep;
+        if (step <= 0)
+            step = TickMath.DeriveStepFromOrderBook(snap, _settings.Depth) ?? 0m;
+
+        var entryPrice = baseEntryPrice;
+
+        if (offsetFromDensity)
+        {
+            entryPrice = TickMath.ShiftFromDensity(entrySide, baseEntryPrice, step, _settings.EntryOffsetTicks);
+        }
+
+        if (step > 0)
+        {
+            entryPrice = TickMath.RoundToStep(entryPrice, step);
+            entryPrice = TickMath.ClampNonCrossing(entrySide, entryPrice, snap, step);
+        }
+
+        _log($"{symbol} entry price: base={baseEntryPrice} -> final={entryPrice} step={step} ticks={_settings.EntryOffsetTicks}");
 
         // Finam: client_order_id <= 20 символов
         // Делаем стабильный короткий id: 1 префикс + 19 символов GUID = 20
@@ -236,9 +276,17 @@ public sealed class ScalperEngine : IDisposable
 
         // 3) Ставим тейк
         var tpSide = entrySide == Side.Buy ? Side.Sell : Side.Buy;
+
         var tpPrice = entrySide == Side.Buy
             ? entryPrice * (1m + _settings.TakeProfitPct)
             : entryPrice * (1m - _settings.TakeProfitPct);
+
+        if (step > 0)
+        {
+            tpPrice = tpSide == Side.Sell
+                ? TickMath.RoundUpToStep(tpPrice, step)
+                : TickMath.RoundDownToStep(tpPrice, step);
+        }
 
         string tpOrderId;
         try

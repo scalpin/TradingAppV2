@@ -1,4 +1,5 @@
-﻿using System;
+﻿//ILiquidityProvider.cs
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace Trading.Core.Interfaces;
 public readonly record struct LiquiditySnapshot(
     decimal LotSize,
     decimal DayVolumeShares,
+    decimal PriceStep,
     double ElapsedTradingMinutes,
     decimal AvgWindowVolumeShares);
 

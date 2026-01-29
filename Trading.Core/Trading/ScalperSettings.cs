@@ -14,11 +14,18 @@ public sealed class ScalperSettings
     // Размер заявки (в акциях/лотах, как у тебя заведено)
     public decimal Qty { get; init; } = 1m;
 
+    // qty в настройках — это лоты (true) или бумаги/shares (false)
+    public bool OrderQtyIsLots { get; init; } = true;
+
+
     // --- новый критерий плотности ---
     public int LiquidityWindowMinutes { get; init; } = 5;
 
     // коэффициент чувствительности (пока 1)
-    public decimal DensityCoef { get; init; } = 0.6m;
+    public decimal DensityCoef { get; init; } = 1m;
+
+    // на сколько тиков сдвигать entryPrice
+    public int EntryOffsetTicks { get; init; } = 1;
 
     // если стакан в лотах — умножаем на LotSize, иначе считаем что уже в акциях
     public bool OrderBookSizeIsLots { get; init; } = true;

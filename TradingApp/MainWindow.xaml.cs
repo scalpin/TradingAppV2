@@ -67,8 +67,12 @@ namespace TradingApp
 
             // позже расширишь список или сделаешь динамическую подписку
 
+            var tickers = new[] { "IRAO" };
+
+            /*
             var tickers = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT", "X5", "BELU", "RUAL",
                       "MOEX", "MGNT", "AFKS", "ALRS", "HYDR", "SVCB", "MTSS", "SIBN", "TATN", "MAGN", "IRAO", "CHMF" };
+            */
 
             var symbols = tickers.Select(t => $"{t}@MISX").ToArray();
 
