@@ -122,10 +122,6 @@ public sealed class ScalperEngine : IDisposable
         var cts = _cts;
         if (cts == null) return;
 
-        var session = _sessions.GetOrAdd(snap.Symbol, s => new SymbolSession(s));
-        if (!session.TryEnterCooldown(_settings.CooldownMs))
-            return;
-
         if (!DensityDetector.TryFind(snap, _settings, _liq, out var signal))
             return;
 
@@ -253,6 +249,8 @@ public sealed class ScalperEngine : IDisposable
             return;
         }
 
+
+        /*
         OrderUpdate entryFinal;
         try
         {
@@ -273,6 +271,65 @@ public sealed class ScalperEngine : IDisposable
 
         if (entryFinal.Status != OrderStatus.Filled)
             return;
+        */
+
+
+        // 2) Ждём: либо entry исполнится, либо плотность развалится, либо таймаут
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct);
+
+        var entryFinalTask = _awaiter.WaitFinalAsync(entryOrderId, ct);
+        var breakTask = WaitDensityBreakAsync(symbol, linked.Token);
+        var timeoutTask = Task.Delay(_settings.EntryTimeoutMs, ct);
+
+        var done = await Task.WhenAny(entryFinalTask, breakTask, timeoutTask);
+
+        if (done == entryFinalTask)
+        {
+            linked.Cancel(); // стопаем монитор развала
+        }
+        else
+        {
+            // плотность умерла или таймаут — пытаемся снять entry
+            var reason = done == breakTask ? "density broken" : "entry timeout";
+            _log($"{symbol} {reason} -> cancel entry id={entryOrderId}");
+
+            try
+            {
+                await _trading.CancelAsync(_accountId, entryOrderId, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _log($"{symbol} entry cancel failed (ok): {ex.GetType().Name}: {ex.Message}");
+            }
+
+            // ждём финал чуть-чуть, чтобы не зависнуть
+            var confirm = await Task.WhenAny(entryFinalTask, Task.Delay(_settings.CancelConfirmTimeoutMs, ct));
+            if (confirm != entryFinalTask)
+            {
+                _log($"{symbol} entry cancel not confirmed in time id={entryOrderId}");
+                return;
+            }
+        }
+
+        OrderUpdate entryFinal;
+        try
+        {
+            entryFinal = await entryFinalTask;
+            _log($"{symbol} entry final {entryFinal.Status} id={entryOrderId}");
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            _log($"{symbol} entry wait canceled id={entryOrderId}");
+            return;
+        }
+
+        // если всё-таки успело исполниться — продолжаем, иначе выходим
+        if (entryFinal.Status != OrderStatus.Filled)
+            return;
+
+
+        //------------------------------------
+
 
         // 3) Ставим тейк
         var tpSide = entrySide == Side.Buy ? Side.Sell : Side.Buy;
@@ -311,17 +368,17 @@ public sealed class ScalperEngine : IDisposable
         }
 
         // 4) Ждём: либо тейк, либо развал плотности
-        using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        using var linkedTp = CancellationTokenSource.CreateLinkedTokenSource(ct);
 
         var tpFinalTask = _awaiter.WaitFinalAsync(tpOrderId, ct);
-        var breakTask = WaitDensityBreakAsync(symbol, linked.Token);
+        var breakTpTask = WaitDensityBreakAsync(symbol, linkedTp.Token);
 
-        var done = await Task.WhenAny(tpFinalTask, breakTask);
+        var doneTp = await Task.WhenAny(tpFinalTask, breakTpTask);
 
-        if (done == tpFinalTask)
+        if (doneTp == tpFinalTask)
         {
             // Тейк завершился — стопаем мониторинг развала
-            linked.Cancel();
+            linkedTp.Cancel();
 
             try
             {

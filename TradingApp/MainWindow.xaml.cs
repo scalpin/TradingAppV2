@@ -67,7 +67,7 @@ namespace TradingApp
 
             // позже расширишь список или сделаешь динамическую подписку
 
-            var tickers = new[] { "IRAO" };
+            var tickers = new[] { "ROSN" };
 
             /*
             var tickers = new[] { "SBER", "MTLR", "GAZP", "LKOH", "AFLT", "ASTR", "KROT", "X5", "BELU", "RUAL",

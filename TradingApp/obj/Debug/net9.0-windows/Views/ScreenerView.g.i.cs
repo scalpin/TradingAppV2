@@ -52,7 +52,7 @@ namespace TradingApp {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/TradingApp;component/views/screenerview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/TradingApp;V1.0.0.0;component/views/screenerview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\ScreenerView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

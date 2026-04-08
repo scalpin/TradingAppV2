@@ -149,7 +149,7 @@ namespace TradingApp
                 OrderQtyIsLots = true,
 
                 LiquidityWindowMinutes = 5,
-                DensityCoef = 1m,
+                DensityCoef = 0.1m,
                 OrderBookSizeIsLots = true,
                 MinDayVolumeShares = 100_000m,
 

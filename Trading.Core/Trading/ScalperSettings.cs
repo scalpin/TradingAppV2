@@ -39,4 +39,7 @@ public sealed class ScalperSettings
     public int CooldownMs { get; init; } = 2000;
     public int Depth { get; init; } = 20;
     public int BreakCheckMs { get; init; } = 200;
+
+    public int EntryTimeoutMs { get; init; } = 1800000;          // сколько ждём исполнение entry
+    public int CancelConfirmTimeoutMs { get; init; } = 2000;  // сколько ждём финал после cancel
 }
