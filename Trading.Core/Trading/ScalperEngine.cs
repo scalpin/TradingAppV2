@@ -119,16 +119,29 @@ public sealed class ScalperEngine : IDisposable
         }
         */
 
+        // Если стратегия не запущена — просто храним снапшоты
         var cts = _cts;
-        if (cts == null) return;
+        if (cts == null)
+            return;
 
+        var session = _sessions.GetOrAdd(snap.Symbol, s => new SymbolSession(s));
+
+        // Если символ в кулдауне — не торгуем его
+        if (session.IsInCooldown())
+            return;
+
+        // Детектор плотностей
         if (!DensityDetector.TryFind(snap, _settings, _liq, out var signal))
             return;
 
-        _ = Observe(RunCycleAsync(snap.Symbol, signal, manual: false, cts.Token),
-            $"cycle faulted {snap.Symbol}");
+        // Запускаем цикл в фоне
+        _ = Observe(
+            RunCycleAsync(snap.Symbol, signal, manual: false, cts.Token),
+            $"cycle faulted {snap.Symbol}"
+        );
     }
 
+    /*
     private async Task RunCycleAsync(string symbol, DensitySignal signal, bool manual, CancellationToken ct)
     {
         var session = _sessions.GetOrAdd(symbol, s => new SymbolSession(s));
@@ -172,6 +185,76 @@ public sealed class ScalperEngine : IDisposable
             session.Lock.Release();
         }
     }
+    */
+
+
+    // новый пробный
+    private async Task RunCycleAsync(string symbol, DensitySignal signal, bool manual, CancellationToken ct)
+    {
+        var session = _sessions.GetOrAdd(symbol, s => new SymbolSession(s));
+
+        // Лочим символ на время сделки
+        if (!await session.Lock.WaitAsync(0, ct))
+            return;
+
+        var shouldStartCooldown = false;
+
+        try
+        {
+            // если вдруг пока мы ждали/влетели в цикл, символ уже в кулдауне — выходим
+            if (!manual && session.IsInCooldown())
+                return;
+
+            // Берём актуальный снапшот
+            if (!_lastSnap.TryGetValue(symbol, out var snap))
+                return;
+
+            if (manual)
+            {
+                var bb = snap.Bids.FirstOrDefault();
+                var ba = snap.Asks.FirstOrDefault();
+                if (bb == null || ba == null) return;
+
+                var entrySide = signal.Side;
+                var entryPrice = entrySide == Side.Buy ? bb.Price * 0.98m : ba.Price * 1.02m;
+
+                await RunTradeLifecycle(symbol, entrySide, entryPrice, offsetFromDensity: true, ct);
+                return;
+            }
+
+            // Сохраняем параметры плотности для мониторинга
+            session.ClusterPrice = signal.Price;
+            session.ClusterSize = signal.Size;
+            session.ClusterSide = signal.Side;
+
+            _log($"{symbol} density {signal.Side} p={signal.Price} size={signal.Size}");
+
+            // если дошли сюда — это уже настоящий цикл стратегии,
+            // значит после завершения надо включить кулдаун
+            shouldStartCooldown = true;
+
+            await RunTradeLifecycle(symbol, signal.Side, signal.Price, offsetFromDensity: true, ct);
+        }
+        finally
+        {
+            // Чистим состояние текущего цикла
+            session.EntryOrderId = null;
+            session.TpOrderId = null;
+            session.ClusterPrice = null;
+            session.ClusterSize = null;
+            session.ClusterSide = null;
+
+            if (shouldStartCooldown)
+            {
+                session.StartCooldown(_settings.CooldownMs);
+                _log($"{symbol} cooldown started for {_settings.CooldownMs / 1000} sec");
+            }
+
+            session.Lock.Release();
+        }
+    }
+
+
 
     private async Task RunTradeLifecycle(string symbol, Side entrySide, decimal baseEntryPrice, bool offsetFromDensity, CancellationToken ct)
     {
@@ -488,21 +571,35 @@ public sealed class ScalperEngine : IDisposable
         public decimal? ClusterPrice;
         public decimal? ClusterSize;
 
-        private long _nextAllowedTicks;
+        private long _cooldownUntilTicks;
 
         public SymbolSession(string symbol) => Symbol = symbol;
 
-        public bool TryEnterCooldown(int cooldownMs)
+        public bool IsInCooldown()
         {
             var now = DateTimeOffset.UtcNow.Ticks;
-            var next = Interlocked.Read(ref _nextAllowedTicks);
+            var until = Interlocked.Read(ref _cooldownUntilTicks);
+            return now < until;
+        }
 
-            if (now < next)
-                return false;
+        public void StartCooldown(int cooldownMs)
+        {
+            if (cooldownMs <= 0)
+            {
+                Interlocked.Exchange(ref _cooldownUntilTicks, 0);
+                return;
+            }
 
-            // резервируем "окно" следующего допуска
-            Interlocked.Exchange(ref _nextAllowedTicks, now + TimeSpan.FromMilliseconds(cooldownMs).Ticks);
-            return true;
+            var until = DateTimeOffset.UtcNow
+                .AddMilliseconds(cooldownMs)
+                .Ticks;
+
+            Interlocked.Exchange(ref _cooldownUntilTicks, until);
+        }
+
+        public void ResetCooldown()
+        {
+            Interlocked.Exchange(ref _cooldownUntilTicks, 0);
         }
     }
 }

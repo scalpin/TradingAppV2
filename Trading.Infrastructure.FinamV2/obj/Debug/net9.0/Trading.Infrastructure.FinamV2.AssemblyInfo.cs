@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Trading.Infrastructure.FinamV2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+204a920ec294f56ee3681429fdc600ceefe78866")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1bf87b59f26bd6e0b871730a0150c9451892b725")]
 [assembly: System.Reflection.AssemblyProductAttribute("Trading.Infrastructure.FinamV2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Trading.Infrastructure.FinamV2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

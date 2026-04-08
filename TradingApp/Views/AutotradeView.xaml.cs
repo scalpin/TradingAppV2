@@ -143,22 +143,9 @@ namespace TradingApp
         {
             if (_rt == null || _scalper == null) return;
 
-            var settings = new Trading.Core.Trading.ScalperSettings
-            {
-                Qty = 1m,
-                OrderQtyIsLots = true,
-
-                LiquidityWindowMinutes = 5,
-                DensityCoef = 0.1m,
-                OrderBookSizeIsLots = true,
-                MinDayVolumeShares = 100_000m,
-
-                TakeProfitPct = 0.001m,
-                BreakFactor = 0.5m,
-                CooldownMs = 2000,
-                Depth = 20,
-                BreakCheckMs = 200
-            };
+            var settings = new Trading.Core.Trading.ScalperSettings(
+            // можно прописать недефолтные значения настроек    
+                );
 
             _scalper.Start(_rt.AccountId, settings);
             Log("strategy start pressed");

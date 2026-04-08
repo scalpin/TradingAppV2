@@ -22,7 +22,7 @@ public sealed class ScalperSettings
     public int LiquidityWindowMinutes { get; init; } = 5;
 
     // коэффициент чувствительности (пока 1)
-    public decimal DensityCoef { get; init; } = 1m;
+    public decimal DensityCoef { get; init; } = 2.5m;
 
     // на сколько тиков сдвигать entryPrice
     public int EntryOffsetTicks { get; init; } = 1;
@@ -34,11 +34,11 @@ public sealed class ScalperSettings
     public decimal MinDayVolumeShares { get; init; } = 100m;
 
     // тейк/развал/кулдаун
-    public decimal TakeProfitPct { get; init; } = 0.001m;
+    public decimal TakeProfitPct { get; init; } = 0.0005m;
     public decimal BreakFactor { get; init; } = 0.5m;
-    public int CooldownMs { get; init; } = 2000;
+    public int CooldownMs { get; init; } = 5 * 60 * 1000; // кд между сделками по инструменту
     public int Depth { get; init; } = 20;
-    public int BreakCheckMs { get; init; } = 200;
+    public int BreakCheckMs { get; init; } = 100;
 
     public int EntryTimeoutMs { get; init; } = 1800000;          // сколько ждём исполнение entry
     public int CancelConfirmTimeoutMs { get; init; } = 2000;  // сколько ждём финал после cancel
